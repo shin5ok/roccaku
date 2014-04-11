@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use opts;
 use FindBin;
-use qq($FindBin::Bin/../lib);
+use lib qq($FindBin::Bin/../lib);
 require Roccaku;
 
 opts my $config    => { isa => 'Str', default => qq{config.yaml}, },
