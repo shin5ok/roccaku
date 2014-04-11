@@ -1,4 +1,4 @@
-package Roccaku::Run::Must;
+package Roccaku::Run::Do;
 
 use 5.006;
 use strict;
@@ -10,4 +10,4 @@ sub run {
   my ($self) = @_;
 }
 
-1; # End of Roccaku::Must;
+1; # End of Roccaku::Do;

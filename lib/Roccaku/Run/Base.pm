@@ -12,4 +12,8 @@ sub test {
 
 }
 
+sub logging {
+
+}
+
 1; # End of Roccaku
