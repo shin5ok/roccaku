@@ -39,7 +39,7 @@ sub new {
   my ($class, @args) = @_;
 
   my $obj = bless {
-              test_only => 0,
+              test_only => undef,
             }, $class;
 
   $obj->parse;
@@ -56,6 +56,11 @@ sub run {
 }
 
 sub set_test_only {
+  my $self      = shift;
+  my $test_only = shift;
+  $self->{test_only} = $test_only;
+
+  return $self;
 
 }
 

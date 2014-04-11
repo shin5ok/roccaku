@@ -11,4 +11,6 @@ opts my $config    => { isa => 'Str', default => qq{config.yaml}, },
 
 my $r6 = Roccaku->new( $config );
 
+$r6->set_test_only( $test_only );
 $r6->run;
+
