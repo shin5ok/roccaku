@@ -35,62 +35,21 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 function1
+sub new {
+  my ($class, @args) = @_;
 
-=cut
+  my $obj = bless {}, $class;
+  return $obj;
 
-sub function1 {
 }
 
-=head2 function2
+sub parse {
 
-=cut
-
-sub function2 {
 }
 
-=head1 AUTHOR
+sub run {
 
-shin5ok, C<< <shin5ok at 55mp.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-roccaku at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Roccaku>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Roccaku
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Roccaku>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Roccaku>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Roccaku>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Roccaku/>
-
-=back
-
+}
 
 =head1 ACKNOWLEDGEMENTS
 
