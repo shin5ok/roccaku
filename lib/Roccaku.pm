@@ -35,11 +35,17 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 SUBROUTINES/METHODS
 
+use YAML;
+use Carp;
+
 sub new {
-  my ($class, @args) = @_;
+  my ($class, $config_path) = @_;
 
   my $obj = bless {
-              test_only => undef,
+              test_only   => undef,
+              debug       => 0,
+              run_objects => [],
+              config_path => $config_path,
             }, $class;
 
   $obj->parse;
@@ -48,7 +54,31 @@ sub new {
 }
 
 sub parse {
+  my ($self) = @_;
 
+  my $config;
+  local $@;
+  eval {
+    $config = YAML::LoadFile( $self->{config_path} );
+  };
+  if ($@) {
+    croak "$self->{config_path} cannot be read($@)";
+  }
+  while ( my ($name, $value) = each %$config ) {
+    my $module_name      = ucfirst $name;
+    my $full_module_name = qq{Roccaku::Run::} . $module_name;
+    {
+      local $@;
+      eval qq{$full_module_name};
+      if ($@) {
+        croak "$full_module_name was load failure($@)";
+      }
+    }
+    push @objects, $full_module_name->new( $value );
+  }
+
+  $self->{run_objects} = \@objects;
+  return $self;
 }
 
 sub run {
@@ -59,6 +89,16 @@ sub set_test_only {
   my $self      = shift;
   my $test_only = shift;
   $self->{test_only} = $test_only;
+
+  return $self;
+
+}
+
+sub set_debug {
+  my $self = shift;
+  my $flag = shift || 0;
+
+  $self->{debug} = $flag;
 
   return $self;
 
