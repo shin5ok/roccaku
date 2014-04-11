@@ -38,7 +38,11 @@ if you don't export anything, such as for a purely object-oriented module.
 sub new {
   my ($class, @args) = @_;
 
-  my $obj = bless {}, $class;
+  my $obj = bless {
+              test_only => 0,
+            }, $class;
+
+  $obj->parse;
   return $obj;
 
 }
@@ -48,6 +52,10 @@ sub parse {
 }
 
 sub run {
+
+}
+
+sub set_test_only {
 
 }
 

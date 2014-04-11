@@ -5,8 +5,11 @@ use strict;
 use warnings FATAL => 'all';
 
 sub new {
-  my $class = shift;
   bless {}, $class;
+}
+
+sub test {
+
 }
 
 1; # End of Roccaku
