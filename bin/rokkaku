@@ -4,7 +4,7 @@ use warnings;
 use opts;
 use FindBin;
 use lib qq($FindBin::Bin/../lib);
-require Roccaku;
+use Roccaku;
 
 opts my $config    => { isa => 'Str', default => qq{config.yaml}, },
      my $debug     => { isa => 'Bool' },

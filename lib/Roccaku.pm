@@ -35,11 +35,17 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 SUBROUTINES/METHODS
 
+=cut
+
 use YAML;
 use Carp;
 
 sub new {
   my ($class, $config_path) = @_;
+
+  if (not defined $config_path) {
+    croak "config_path must be given";
+  }
 
   my $obj = bless {
               test_only   => undef,
@@ -64,12 +70,14 @@ sub parse {
   if ($@) {
     croak "$self->{config_path} cannot be read($@)";
   }
-  while ( my ($name, $value) = each %$config ) {
+
+  my @objects;
+  while ( my ($name, $value) = each %{$config->[0]} ) {
     my $module_name      = ucfirst $name;
     my $full_module_name = qq{Roccaku::Run::} . $module_name;
     {
       local $@;
-      eval qq{$full_module_name};
+      eval qq{use $full_module_name};
       if ($@) {
         croak "$full_module_name was load failure($@)";
       }
