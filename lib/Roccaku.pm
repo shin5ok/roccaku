@@ -37,11 +37,12 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =cut
 
+use Data::Dumper;
 use YAML;
 use Carp;
 
 sub new {
-  my ($class, $config_path) = @_;
+  my ($class, $config_path, $option) = @_;
 
   if (not defined $config_path) {
     croak "config_path must be given";
@@ -53,6 +54,11 @@ sub new {
               run_objects => [],
               config_path => $config_path,
             }, $class;
+
+  {
+    no strict 'refs';
+    $obj->debug( $option->{debug} );
+  }
 
   $obj->parse;
   return $obj;
@@ -66,13 +72,15 @@ sub parse {
   local $@;
   eval {
     $config = YAML::LoadFile( $self->{config_path} );
+    warn Dumper $config if $self->debug;
   };
   if ($@) {
     croak "$self->{config_path} cannot be read($@)";
   }
 
   my @objects;
-  while ( my ($name, $value) = each %{$config->[0]} ) {
+  for my $c ( @$config ) {
+    my ($name, $value) = each %$c;
     my $module_name      = ucfirst $name;
     my $full_module_name = qq{Roccaku::Run::} . $module_name;
     {
@@ -85,6 +93,8 @@ sub parse {
     push @objects, $full_module_name->new( $value );
   }
 
+  warn Dumper \@objects if $self->debug;
+
   $self->{run_objects} = \@objects;
   return $self;
 }
@@ -93,22 +103,23 @@ sub run {
 
 }
 
-sub set_test_only {
-  my $self      = shift;
-  my $test_only = shift;
-  $self->{test_only} = $test_only;
+sub test_only {
+  my ($self, $flag) = @_;
+  if (@_ == 2) {
+    $self->{debug} = $flag;
+  }
 
-  return $self;
+  return $self->{test_only};
 
 }
 
-sub set_debug {
-  my $self = shift;
-  my $flag = shift || 0;
+sub debug {
+  my ($self, $flag) = @_;
+  if (@_ == 2) {
+    $self->{debug} = $flag;
+  }
 
-  $self->{debug} = $flag;
-
-  return $self;
+  return $self->{debug};
 
 }
 

@@ -6,12 +6,13 @@ use FindBin;
 use lib qq($FindBin::Bin/../lib);
 use Roccaku;
 
-opts my $config    => { isa => 'Str', default => qq{config.yaml}, },
-     my $debug     => { isa => 'Bool' },
-     my $test_only => { isa => 'Bool' };
+opts my $config_path => { isa => 'Str', default => qq{config.yaml}, },
+     my $debug       => { isa => 'Bool' },
+     my $test_only   => { isa => 'Bool' };
 
-my $r6 = Roccaku->new( $config );
+my $r6 = Roccaku->new( $config_path, +{ debug => $debug } );
 
-$r6->set_test_only( $test_only );
+$r6->test_only( $test_only );
+
 $r6->run;
 
