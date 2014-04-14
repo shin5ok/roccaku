@@ -80,17 +80,20 @@ sub parse {
 
   my @objects;
   for my $c ( @$config ) {
-    my ($name, $value) = each %$c;
-    my $module_name      = ucfirst $name;
-    my $full_module_name = qq{Roccaku::Run::} . $module_name;
-    {
-      local $@;
-      eval qq{use $full_module_name};
-      if ($@) {
-        croak "$full_module_name was load failure($@)";
+    for my $name (keys %$c) {
+      my $value = $c->{$name};
+      my $module_name      = ucfirst $name;
+      my $full_module_name = qq{Roccaku::Run::} . $module_name;
+      warn "module name: ", $full_module_name if $self->debug;
+      {
+        local $@;
+        eval qq{use $full_module_name};
+        if ($@) {
+          croak "$full_module_name was load failure($@)";
+        }
       }
+      push @objects, $full_module_name->new( $value );
     }
-    push @objects, $full_module_name->new( $value );
   }
 
   warn Dumper \@objects if $self->debug;
