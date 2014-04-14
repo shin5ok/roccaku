@@ -29,18 +29,17 @@ sub file {
   }
 
   my @patterns = ref $argv->{pattern} eq q{ARRAY}
-               ? @{$argv->{pattern}
+               ? @{$argv->{pattern}}
                : ( $argv->{pattern} );
 
   my @contents = <$fh>;
   my $failure = 0;
-  for my @$pattern ( @patterns ) {
-    if (! grep /$pattern/ @contents) {
+  for my $pattern ( @patterns ) {
+    if (! grep m{$pattern}, @contents) {
       $self->fail("$argv->{path} don't have line $pattern");
       $failure++;
     }
   }
-  return $self;
 
   return $failure == 0;
 

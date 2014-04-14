@@ -58,7 +58,7 @@ sub command {
     my $exit_code = $? >> 8;
 
     if ($exit_code != 0) {
-      $eslf->logging( $e );
+      $self->logging( $e );
       return undef;
     }
 

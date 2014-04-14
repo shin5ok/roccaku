@@ -78,8 +78,10 @@ sub parse {
     croak "$self->{config_path} cannot be read($@)";
   }
 
+  warn ref $config;
+
   my @objects;
-  for my $c ( @$config ) {
+  for my $c ( @{$config->{run}} ) {
     for my $name (keys %$c) {
       my $value = $c->{$name};
       my $module_name      = ucfirst $name;
