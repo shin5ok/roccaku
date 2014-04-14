@@ -16,13 +16,33 @@ sub favor {
       }
     } else {
       $self->command( $arg );
-
     }
   }
-
 }
 
 sub file {
+  my ($self, $argv) = @_;
+  open my $fh, "<", $argv->{path};
+  if (! $fh) {
+    $self->fail("$argv->{path} cannot open");
+    return 0;
+  }
+
+  my @patterns = ref $argv->{pattern} eq q{ARRAY}
+               ? @{$argv->{pattern}
+               : ( $argv->{pattern} );
+
+  my @contents = <$fh>;
+  my $failure = 0;
+  for my @$pattern ( @patterns ) {
+    if (! grep /$pattern/ @contents) {
+      $self->fail("$argv->{path} don't have line $pattern");
+      $failure++;
+    }
+  }
+  return $self;
+
+  return $failure == 0;
 
 }
 

@@ -61,6 +61,8 @@ sub command {
       $eslf->logging( $e );
       return undef;
     }
+
+    return 1;
   }
 }
 
