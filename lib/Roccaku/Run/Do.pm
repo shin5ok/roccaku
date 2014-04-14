@@ -6,10 +6,6 @@ use warnings FATAL => 'all';
 
 use base qw( Roccaku::Run::Base );
 
-# sub favor {
-#   shift->SUPER::favor;
-# }
-
 sub favor {
   my ($self, @args) = @_;
 
@@ -32,25 +28,69 @@ sub file {
     $self->fail("$argv->{path} cannot open");
     return 0;
   }
-  seek $fh, 0, 0;
   flock $fh, 2;
 
   my @contents = <$fh>;
-  my @patterns = ref $argv->{pattern} eq q{ARRAY}
-               ? @{$argv->{pattern}}
-               : ( $argv->{pattern} );
+  my @rewrites = ref $argv->{rewrite} eq q{ARRAY}
+               ? @{$argv->{rewrite}}
+               : ( $argv->{rewrite} );
 
   my $failure = 0;
+  my @news;
   local $@;
   eval {
-    for my $pattern ( @patterns ) {
-      if (! grep m{$pattern}, @contents) {
-        $self->fail("$argv->{path} don't have $pattern in any lines");
-        $failure++;
+    no strict 'refs';
+    for my $r ( @rewrites ) {
+      my %cond;
+      exists $r->{after}  and $cond{after}  = 0;
+      exists $r->{before} and $cond{before} = 0;
+
+      my $regexp;
+      my $cond_name;
+      _CONTENTS_:
+      for my $line ( @contents ) {
+        if (exists $cond{after} and exists $cond{before}) {
+          if (! $cond{after}) {
+            $regexp    = $r->{after};
+            $cond_name = "after";
+          } else {
+            $regexp    = $r->{before};
+            $cond_name = "before";
+          }
+        } elsif (    exists $cond{after} and not exists $cond{before}) {
+          $regexp    = $r->{after};
+          $cond_name = "after";
+        } elsif (not exists $cond{after} and     exists $cond{before}) {
+          $regexp    = $r->{before};
+          $cond_name = "before";
+        }
+
+        if (defined $regexp and $line =~ /$regexp/) {
+          $cond{$cond_name} = 1;
+          if ($cond_name eq q{before}) {
+            push @news, $r->{add}, $line;
+            $regexp = undef;
+          }
+          elsif ($cond_name eq q{after}) {
+            if (not exists $cond{before}) {
+              push @news, $line, $r->{add};
+              $regexp = undef;
+            }
+          }
+          elsif (exists $r->{remove} and $line =~ /$r->{remove}/) {
+            next _CONTENTS_;
+          } else {
+            push @news, $line;
+          }
+        }
+
       }
     }
   };
-  warn $@ if $@;
+
+  seek $fh, 0, 0;
+  truncate $fh, 0;
+  print {$fh} @news;
 
   return $failure == 0;
 
