@@ -78,8 +78,6 @@ sub parse {
     croak "$self->{config_path} cannot be read($@)";
   }
 
-  warn ref $config;
-
   my @objects;
   for my $c ( @{$config->{run}} ) {
     for my $name (keys %$c) {
@@ -106,7 +104,12 @@ sub parse {
 }
 
 sub run {
+  my ($self) = @_;
 
+  my $run_objects = $self->{run_objects};
+  for my $object ( @{$run_objects} ) {
+    $object->run;
+  }
 }
 
 sub test_only {

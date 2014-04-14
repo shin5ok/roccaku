@@ -9,6 +9,9 @@ use Data::Dumper;
 use Carp;
 use IPC::Open3;
 
+our $SYSLOG_FACILITY = q{local1};
+our $SYSLOG_LEVEL    = q{info};
+
 sub new {
   my ($class, $params) = @_;
 
@@ -33,6 +36,10 @@ sub run {
 
 sub logging {
   my ($self, $string) = @_;
+  openlog __FILE__, q{ndelay,pid}, $SYSLOG_FACILITY;
+  setlogsock 'unix';
+  syslog $SYSLOG_LEVEL, qq{$string};
+  closelog;
 
 }
 
@@ -41,7 +48,7 @@ sub params {
   if (defined $params) {
     $self->{params} = $params;
   }
-  return $params;
+  return $self->{params};
 }
 
 sub favor {
@@ -51,6 +58,8 @@ sub favor {
 sub command {
   my ($self, $command) = @_;
   my ($w, $r, $e);
+  $command ||= "";
+  $self->logging("[try to exec]: $command");
   my $pid = open3 $w, $r, $e, $command; # It might have a deadlock problem
 
   if ($pid != 0){
@@ -58,7 +67,7 @@ sub command {
     my $exit_code = $? >> 8;
 
     if ($exit_code != 0) {
-      $self->logging( $e );
+      $self->logging( $e || qq{} );
       return undef;
     }
 
@@ -74,7 +83,7 @@ sub fail {
     push @{$self->{fail}}, @fails;
   }
 
-  $self->fail;
+  return $self->{fail};
 }
 
 1; # End of Roccaku
