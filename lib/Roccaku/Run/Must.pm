@@ -6,10 +6,23 @@ use warnings FATAL => 'all';
 
 use base qw( Roccaku::Run::Base );
 
-sub run {
-  my ($self) = @_;
+sub favor {
+  my ($self, @args) = @_;
 
-  my $params = $self->params;
+  for my $arg ( @args ) {
+    if (ref $arg eq q{HASH}) {
+      while (my ($method, $value) = each %$arg) {
+        $self->$method( $value );
+      }
+    } else {
+      $self->command( $arg );
+
+    }
+  }
+
+}
+
+sub file {
 
 }
 
