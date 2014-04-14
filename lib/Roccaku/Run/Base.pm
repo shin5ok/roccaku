@@ -79,8 +79,9 @@ sub fail {
   my $self  = shift;
   my @fails = @_;
 
+  my $caller = caller;
   if (@fails > 0) {
-    push @{$self->{fail}}, @fails;
+    push @{$self->{fail}}, map { "$caller: $_" } @fails;
   }
 
   return $self->{fail};
