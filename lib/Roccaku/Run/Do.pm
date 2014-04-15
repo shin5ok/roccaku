@@ -8,6 +8,7 @@ use base qw( Roccaku::Run::Base );
 
 sub favor {
   my ($self, @args) = @_;
+  $self->logging("[Do]: try to fix", "stderr");
 
   for my $arg ( @args ) {
     if (ref $arg eq q{HASH}) {

@@ -110,6 +110,7 @@ sub run {
 
   my $test_only = $self->test_only;
 
+  my (@must_fails, @do_fails);
   my $run_objects = $self->{run_objects};
   for my $ref ( @{$run_objects} ) {
     if (exists $ref->{say}) {
@@ -119,13 +120,25 @@ sub run {
     if (exists $ref->{must}) {
       my $must = $ref->{must};
       my $is_must = $must->run;
+      push @must_fails, $must->fail;
 
       if (not $is_must and exists $ref->{do} and not $self->test_only) {
         my $do = $ref->{do};
         $do->run;
+        push @do_fails, $do->fail;
       }
     }
   }
+
+  my $successful = @must_fails + @do_fails == 0
+                 ? 1
+                 : 0;
+
+  return +{
+            successful => $successful,
+            must_fails => \@must_fails,
+            do_fails   => \@do_fails,
+          };
 }
 
 sub test_only {

@@ -32,9 +32,9 @@ sub run {
 
   $self->favor( @args );
 
-  my $fail_ref = $self->fail;
-  if (@$fail_ref > 0) {
-    $self->logging("[FAILURE]: $_", "__STDERR__") for @$fail_ref;
+  my @fails = $self->fail;
+  if (@fails > 0) {
+    $self->logging("[FAIL]: $_", "__STDERR__") for @fails;
     return 0;
   }
   return 1;
@@ -47,7 +47,7 @@ sub logging {
   setlogsock 'unix';
   syslog $SYSLOG_LEVEL, qq{$string};
   closelog;
-  warn "\t$string" if $stderr;
+  print {*STDERR} "\t$string\n" if $stderr;
 
 }
 
@@ -93,7 +93,8 @@ sub fail {
     push @{$self->{fail}}, map { "$caller: $_" } @fails;
   }
 
-  return $self->{fail};
+  return @{$self->{fail}} if wantarray;
+  return   $self->{fail};
 }
 
 1; # End of Roccaku
