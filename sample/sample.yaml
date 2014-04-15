@@ -1,23 +1,35 @@
 ---
-- env:
-    LANG: C
-    PATH: /sbin:/usr/sbin:/bin:/usr/bin
-    http_proxy: http://192.168.232.11:3128
-- must:
-    - rpm -qa | grep postfix
-    - ps ax | grep postfix/master
-  do:
-    - yum -y install postfix
-    - service postfix start
-  say: postfix installed
-- must: rpm -qa | grep perl-Sys-Guestfs
-  do: yum -y install perl-Sys-Guestfs
-- must: chkconfig --list | grep 3:on | grep postfix
-  do: chkconfig postfix on
-- must:
-    /etc/postfix/main.cf: /^relayhost\s*\=\s*\[192\.168\.232\.10\]/
-  do:
-    file: /etc/postfix/main.cf:
-    after: /^setgid_group/
-    before: ''
-    add: 'relayhost = [192.168.232.10]\n'
+env:
+  LANG: C
+  PATH: /sbin:/usr/sbin:/bin:/usr/bin
+  http_proxy: http://192.168.232.11:3128
+run:
+  - must:
+      - rpm -qa | grep postfix
+      - ps ax | grep postfix/master
+    do:
+      - yum -y install postfix
+      - service postfix start
+    say: postfix installed
+  - must: rpm -qa | grep perl-Sys-Guestfs
+    do: yum -y install perl-Sys-Guestfs
+    say: perl-Sys-Guestfs installed
+  - must: chkconfig --list | grep 3:on | grep postfix
+    do: chkconfig postfix on
+    say: postfix is ready to start
+  - must:
+      file:
+        path: /etc/postfix/main.cf
+        pattern:
+          - "^relayhost\s*\=\s*\[192\.168\.232\.10\]\n"
+          - "^transport_maps"
+    do:
+      file:
+        path: /etc/postfix/main.cf
+        rewrite:
+          - add: "relayhost = [192.168.232.10]\n"
+            after: '^setgid_group'
+            before: '^readme_directory'
+          - add: "transport_maps = hash:/etc/postfix/transport\n"
+            before: '^html_directory'
+    say: postfix main.cf is configured

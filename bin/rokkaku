@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use opts;
 use FindBin;
+
 use lib qq($FindBin::Bin/../lib);
 use Roccaku;
 
@@ -15,4 +16,3 @@ my $r6 = Roccaku->new( $config_path, +{ debug => $debug } );
 $r6->test_only( $test_only );
 
 $r6->run;
-

@@ -34,7 +34,7 @@ sub run {
 
   my $fail_ref = $self->fail;
   if (@$fail_ref > 0) {
-    warn $_ for @$fail_ref;
+    warn "\t[FAILURE]: ", $_ for @$fail_ref;
     return 0;
   }
   return 1;
