@@ -23,20 +23,21 @@ sub favor {
 sub file {
   my ($self, $argv) = @_;
 
-  open my $fh, "<", $argv->{path};
+  open my $fh, "+<", $argv->{path};
   if (! $fh) {
     $self->fail("$argv->{path} cannot open");
     return 0;
   }
   flock $fh, 2;
+  seek $fh, 0, 0;
 
   my @contents = <$fh>;
   my @rewrites = ref $argv->{rewrite} eq q{ARRAY}
                ? @{$argv->{rewrite}}
                : ( $argv->{rewrite} );
 
-  my $failure = 0;
   my @news;
+  my $failure = 0;
   local $@;
   eval {
     no strict 'refs';
@@ -44,6 +45,9 @@ sub file {
       my %cond;
       exists $r->{after}  and $cond{after}  = 0;
       exists $r->{before} and $cond{before} = 0;
+
+      @news > 0 and @contents = @news;
+      @news = ();
 
       my $regexp;
       my $cond_name;
@@ -70,11 +74,13 @@ sub file {
           if ($cond_name eq q{before}) {
             push @news, $r->{add}, $line;
             $regexp = undef;
+            next _CONTENTS_;
           }
           elsif ($cond_name eq q{after}) {
             if (not exists $cond{before}) {
               push @news, $line, $r->{add};
               $regexp = undef;
+              next _CONTENTS_;
             }
           }
           elsif (exists $r->{remove} and $line =~ /$r->{remove}/) {
@@ -82,6 +88,8 @@ sub file {
           } else {
             push @news, $line;
           }
+        } else {
+          push @news, $line;
         }
 
       }
