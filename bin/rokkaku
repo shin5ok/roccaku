@@ -3,9 +3,12 @@ use strict;
 use warnings;
 use opts;
 use FindBin;
+use Data::Dumper;
 
 use lib qq($FindBin::Bin/../lib);
 use Roccaku;
+
+our @argv = @ARGV;
 
 opts my $config_path => { isa => 'Str', default => qq{config.yaml}, },
      my $debug       => { isa => 'Bool' },
@@ -15,4 +18,36 @@ my $r6 = Roccaku->new( $config_path, +{ debug => $debug } );
 
 $r6->test_only( $test_only );
 
-$r6->run;
+
+local $| = 1;
+printf "  %s is starting to run...", ref $r6;
+sleep 1;
+printf "test phase only" if $r6->test_only;
+sleep 1                  if $r6->test_only;
+printf "\n\n";
+
+my $result = $r6->run;
+
+print "\n";
+if ($result->{success}->{must} and $result->{success}->{do}) {
+  print "  all successful completelly.\n";
+  exit 0;
+}
+elsif ($result->{success}->{must}) {
+  print "  all MUST checking successfully.\n";
+  exit 0;
+}
+elsif (! $result->{success}->{must}) {
+  print "  MUST checking process were failure.\n";
+  if (! $r6->test_only) {
+    printf "  But try to fix for MUST Config\n";
+    printf "  Please run again $0 %s --test-only\n", (join " ", @argv);
+    exit 0;
+  }
+  exit 1;
+}
+elsif (! $result->{success}->{do}) {
+  print "  Configuring process did have some errors.\n";
+  exit 1;
+}
+

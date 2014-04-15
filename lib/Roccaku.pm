@@ -130,14 +130,15 @@ sub run {
     }
   }
 
-  my $successful = @must_fails + @do_fails == 0
-                 ? 1
-                 : 0;
-
   return +{
-            successful => $successful,
-            must_fails => \@must_fails,
-            do_fails   => \@do_fails,
+            success => +{
+                          must => @must_fails == 0,
+                          do   => @do_fails   == 0,
+                        },
+            fail => +{
+              must => \@must_fails,
+              do   => \@do_fails,
+            }
           };
 }
 

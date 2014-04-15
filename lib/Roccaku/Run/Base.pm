@@ -88,9 +88,8 @@ sub fail {
   my $self  = shift;
   my @fails = @_;
 
-  my $caller = caller;
   if (@fails > 0) {
-    push @{$self->{fail}}, map { "$caller: $_" } @fails;
+    push @{$self->{fail}}, @fails;
   }
 
   return @{$self->{fail}} if wantarray;
