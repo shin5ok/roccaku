@@ -80,6 +80,7 @@ sub parse {
 
   my @objects;
   for my $c ( @{$config->{run}} ) {
+    my $hash_ref = +{};
     for my $name (keys %$c) {
       my $value = $c->{$name};
       my $module_name      = ucfirst $name;
@@ -92,9 +93,10 @@ sub parse {
         if ($@) {
           croak "$full_module_name was load failure($@)";
         }
+        $hash_ref->{$name} = $full_module_name->new( $value );
       }
-      push @objects, $full_module_name->new( $value );
     }
+    push @objects, $hash_ref;
   }
 
   warn Dumper \@objects if $self->debug;
