@@ -32,6 +32,13 @@ sub run {
 
   $self->favor( @args );
 
+  if (my @fails = $self->fail > 0) {
+    warn Dumper $self->fail;
+    warn join "\n", @fails;
+    return 0;
+  }
+  return 1;
+
 }
 
 sub logging {

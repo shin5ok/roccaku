@@ -108,9 +108,25 @@ sub parse {
 sub run {
   my ($self) = @_;
 
+  my $test_only = $self->test_only;
+
   my $run_objects = $self->{run_objects};
-  for my $object ( @{$run_objects} ) {
-    $object->run;
+  for my $ref ( @{$run_objects} ) {
+    if (exists $ref->{say}) {
+      my $say = $ref->{say};
+      $say->run;
+    }
+    if (exists $ref->{must}) {
+      my $must = $ref->{must};
+      my $is_must = $must->run;
+
+      warn "is must: $is_must";
+
+      if ($is_must and exists $ref->{do} and not $self->test_ony) {
+        my $do = $ref->{do};
+        $do->run;
+      }
+    }
   }
 }
 
