@@ -34,7 +34,7 @@ sub run {
 
   my $fail_ref = $self->fail;
   if (@$fail_ref > 0) {
-    warn "\t[FAILURE]: ", $_ for @$fail_ref;
+    $self->logging("[FAILURE]: $_", "__STDERR__") for @$fail_ref;
     return 0;
   }
   return 1;
@@ -42,11 +42,12 @@ sub run {
 }
 
 sub logging {
-  my ($self, $string) = @_;
+  my ($self, $string, $stderr) = @_;
   openlog __FILE__, q{ndelay,pid}, $SYSLOG_FACILITY;
   setlogsock 'unix';
   syslog $SYSLOG_LEVEL, qq{$string};
   closelog;
+  warn "\t$string" if $stderr;
 
 }
 
@@ -90,7 +91,6 @@ sub fail {
   my $caller = caller;
   if (@fails > 0) {
     push @{$self->{fail}}, map { "$caller: $_" } @fails;
-    $self->logging( $_ ) for @fails;
   }
 
   return $self->{fail};

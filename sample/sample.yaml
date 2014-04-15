@@ -6,11 +6,13 @@ env:
 run:
   - must:
       - rpm -qa | grep postfix
-      - ps ax | grep postfix/master
     do:
       - yum -y install postfix
-      - service postfix start
     say: postfix installed
+  - must:
+      - ps ax | grep postfix/master | grep -v grep
+    do:
+      - service postfix start
   - must: rpm -qa | grep perl-Sys-Guestfs
     do: yum -y install perl-Sys-Guestfs
     say: perl-Sys-Guestfs installed
