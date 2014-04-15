@@ -10,9 +10,9 @@ our $SAY_NUMBER = 0;
 
 sub favor {
   my ($self, @strings) = @_;
-  $SAY_NUMBER++;
 
   for my $string ( @strings ) {
+    $SAY_NUMBER++;
     printf "%5d: %s\n", $SAY_NUMBER, $string;
   }
 

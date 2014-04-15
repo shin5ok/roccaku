@@ -32,9 +32,9 @@ sub run {
 
   $self->favor( @args );
 
-  if (my @fails = $self->fail > 0) {
-    warn Dumper $self->fail;
-    warn join "\n", @fails;
+  my $fail_ref = $self->fail;
+  if (@$fail_ref > 0) {
+    warn $_ for @$fail_ref;
     return 0;
   }
   return 1;
@@ -69,12 +69,13 @@ sub command {
   $self->logging("[try to exec]: $command");
   my $pid = open3 $w, $r, $e, $command; # It might have a deadlock problem
 
-  if ($pid != 0){
+  if ($pid != 0) {
     waitpid $pid, 0;
     my $exit_code = $? >> 8;
 
     if ($exit_code != 0) {
-      $self->logging( $e || qq{} );
+      $e ||= qq{NONE};
+      $self->fail( "command: $command (output: $e)" );
       return undef;
     }
 
@@ -89,6 +90,7 @@ sub fail {
   my $caller = caller;
   if (@fails > 0) {
     push @{$self->{fail}}, map { "$caller: $_" } @fails;
+    $self->logging( $_ ) for @fails;
   }
 
   return $self->{fail};

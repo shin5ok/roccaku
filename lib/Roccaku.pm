@@ -120,9 +120,7 @@ sub run {
       my $must = $ref->{must};
       my $is_must = $must->run;
 
-      warn "is must: $is_must";
-
-      if ($is_must and exists $ref->{do} and not $self->test_ony) {
+      if (not $is_must and exists $ref->{do} and not $self->test_only) {
         my $do = $ref->{do};
         $do->run;
       }
@@ -133,7 +131,7 @@ sub run {
 sub test_only {
   my ($self, $flag) = @_;
   if (@_ == 2) {
-    $self->{debug} = $flag;
+    $self->{test_only} = $flag;
   }
 
   return $self->{test_only};

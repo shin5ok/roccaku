@@ -100,7 +100,12 @@ sub file {
   truncate $fh, 0;
   print {$fh} @news;
 
-  return $failure == 0;
+  if ($failure != 0) {
+    $self->fail( "$argv->{path} is rewrited failure(s)" );
+    return 0;
+  }
+
+  return 1;
 
 }
 
