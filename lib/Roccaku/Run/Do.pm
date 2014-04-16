@@ -4,6 +4,7 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 
+use lib  qq($FindBin::Bin/../lib);
 use base qw( Roccaku::Run::Base );
 
 sub favor {
