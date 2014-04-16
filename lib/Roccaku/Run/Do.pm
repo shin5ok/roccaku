@@ -71,6 +71,11 @@ sub file {
           $cond_name = "before";
         }
 
+        if (defined $r->{remove} and $line =~ /$r->{remove}/) {
+          $r->{remove} = undef;
+          next _CONTENTS_;
+        }
+
         if (defined $regexp and $line =~ /$regexp/ and defined $r->{add}) {
           $cond{$cond_name} = 1;
           if ($cond_name eq q{before}) {
@@ -86,9 +91,6 @@ sub file {
               $regexp   = undef;
               next _CONTENTS_;
             }
-          }
-          elsif (exists $r->{remove} and $line =~ /$r->{remove}/) {
-            next _CONTENTS_;
           } else {
             push @news, $line;
           }
