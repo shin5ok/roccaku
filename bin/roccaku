@@ -31,6 +31,7 @@ my $result = $r6->run;
 
 __FOR_CLI_RESULT__: {
   local $| = 1;
+  no strict 'refs';
   print "\n";
   if ($result->{success}->{must} and $result->{success}->{do}) {
     print "  all processes was successfully.\n";
