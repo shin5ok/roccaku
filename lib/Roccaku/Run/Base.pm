@@ -6,6 +6,7 @@ use warnings FATAL => 'all';
 
 use Sys::Syslog qw(:DEFAULT setlogsock);
 use Data::Dumper;
+use POSIX qw(strftime);
 use Carp;
 use IPC::Open3;
 
@@ -82,6 +83,21 @@ sub command {
 
     return 1;
   }
+}
+
+sub file_backup {
+  my ($self, @files) = @_;
+  my $datetime = strftime "%Y%m%d%H%M%S", localtime;
+  my @fails;
+  for my $f ( @files ) {
+    ( defined $f and -f $f ) or next;
+    my $r = system "cp -p $f ${f}.$datetime";
+    if ($r != 0) {
+      push @fails, +{ file => $f, exit_code => $? };
+    }
+  }
+  warn Dumper \@fails if @fails > 0;
+  return @fails == 0;
 }
 
 sub fail {

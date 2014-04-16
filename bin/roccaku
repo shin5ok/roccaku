@@ -11,6 +11,7 @@ use Roccaku;
 our @argv = @ARGV;
 
 opts my $config_path => { isa => 'Str', default => qq{config.yaml}, },
+     my $not_backup  => { isa => 'Bool' },
      my $debug       => { isa => 'Bool' },
      my $test_only   => { isa => 'Bool' },
      my $host        => { isa => 'Str'  };

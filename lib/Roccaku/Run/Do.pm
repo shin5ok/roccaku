@@ -4,6 +4,8 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 
+use Carp;
+
 use lib  qq($FindBin::Bin/../lib);
 use base qw( Roccaku::Run::Base );
 
@@ -24,6 +26,9 @@ sub favor {
 
 sub file {
   my ($self, $argv) = @_;
+
+  $self->file_backup( $argv->{path} )
+    or croak "*** backup failure $argv->{path}";
 
   open my $fh, "+<", $argv->{path};
   if (! $fh) {
@@ -74,6 +79,17 @@ sub file {
         if (defined $r->{remove} and $line =~ /$r->{remove}/) {
           $r->{remove} = undef;
           next _CONTENTS_;
+        }
+
+# warn "########## ", Dumper $r->{replace} if $line =~ /SELINUX/;
+        if (defined $r->{replace}->{pre_pattern}
+              and defined $r->{replace}->{post_string}
+                and $line =~ /$r->{replace}->{pre_pattern}/) {
+# warn $r->{replace}->{pre_pattern};
+          push @news, $r->{replace}->{post_string};
+          $r->{replace} = undef;
+          next _CONTENTS_;
+
         }
 
         if (defined $regexp and $line =~ /$regexp/ and defined $r->{add}) {
