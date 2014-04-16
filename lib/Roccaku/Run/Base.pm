@@ -76,8 +76,13 @@ sub command {
     my $exit_code = $? >> 8;
 
     if ($exit_code != 0) {
-      $e ||= qq{NONE};
-      $self->fail( "command: $command (output: $e)" );
+      my $stderr = do { local $/; defined $e and <$e> };
+      my $stdout = do { local $/; defined $r and <$r> };
+
+      $stdout ||= qq{};
+      $stderr ||= qq{};
+      $self->logging( $stdout );
+      $self->fail( "command: $command (stderr: $stderr)" );
       return undef;
     }
 
