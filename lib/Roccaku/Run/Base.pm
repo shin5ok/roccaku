@@ -66,7 +66,7 @@ sub favor {
 sub command {
   my ($self, $command) = @_;
   my ($w, $r, $e);
-  $command ||= "";
+  $command ||= "/bin/false";
   $self->logging("[try to exec]: $command");
   my $pid = open3 $w, $r, $e, $command; # It might have a deadlock problem
 

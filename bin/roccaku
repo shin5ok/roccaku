@@ -47,7 +47,7 @@ __FOR_CLI_RESULT__: {
     if (! $r6->test_only) {
       printf "  But Just now, try to run Configure processes.\n";
       printf "  Run this command again to confirm them.\n";
-      printf "  \$ $0 %s --test-only\n", (join " ", @argv);
+      printf "  \$ $0 %s -t(--test-only)\n", (join " ", @argv);
       exit 0;
     }
     exit 1;
