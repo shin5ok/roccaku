@@ -106,7 +106,8 @@ sub parse {
 }
 
 sub run {
-  my ($self) = @_;
+  # If defined $host, run() method exec on remote $host
+  my ($self, $host) = @_;
 
   my $test_only = $self->test_only;
 

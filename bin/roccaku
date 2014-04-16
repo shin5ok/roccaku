@@ -12,7 +12,8 @@ our @argv = @ARGV;
 
 opts my $config_path => { isa => 'Str', default => qq{config.yaml}, },
      my $debug       => { isa => 'Bool' },
-     my $test_only   => { isa => 'Bool' };
+     my $test_only   => { isa => 'Bool' },
+     my $host        => { isa => 'Str'  };
 
 my $r6 = Roccaku->new( $config_path, +{ debug => $debug } );
 
@@ -27,7 +28,7 @@ __FOR_CLI_OUTPUT__: {
   printf "\n\n";
 }
 
-my $result = $r6->run;
+my $result = $r6->run( $host );
 
 __FOR_CLI_RESULT__: {
   local $| = 1;
