@@ -117,6 +117,9 @@ sub run {
     if (exists $ref->{say}) {
       my $say = $ref->{say};
       $say->run;
+    } else {
+      require Roccaku::Run::Say;
+      Roccaku::Run::Say->new( "(Next process)" )->run;
     }
     if (exists $ref->{must}) {
       my $must = $ref->{must};

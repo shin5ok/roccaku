@@ -71,17 +71,19 @@ sub file {
           $cond_name = "before";
         }
 
-        if (defined $regexp and $line =~ /$regexp/) {
+        if (defined $regexp and $line =~ /$regexp/ and defined $r->{add}) {
           $cond{$cond_name} = 1;
           if ($cond_name eq q{before}) {
             push @news, $r->{add}, $line;
-            $regexp = undef;
+            $r->{add} = undef;
+            $regexp   = undef;
             next _CONTENTS_;
           }
           elsif ($cond_name eq q{after}) {
             if (not exists $cond{before}) {
               push @news, $line, $r->{add};
-              $regexp = undef;
+              $r->{add} = undef;
+              $regexp   = undef;
               next _CONTENTS_;
             }
           }
@@ -95,6 +97,8 @@ sub file {
         }
 
       }
+      push @news, $r->{add} if defined $r->{add};
+
     }
   };
 
