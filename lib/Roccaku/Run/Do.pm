@@ -81,11 +81,9 @@ sub file {
           next _CONTENTS_;
         }
 
-# warn "########## ", Dumper $r->{replace} if $line =~ /SELINUX/;
         if (defined $r->{replace}->{pre_pattern}
               and defined $r->{replace}->{post_string}
                 and $line =~ /$r->{replace}->{pre_pattern}/) {
-# warn $r->{replace}->{pre_pattern};
           push @news, $r->{replace}->{post_string};
           $r->{replace} = undef;
           next _CONTENTS_;
