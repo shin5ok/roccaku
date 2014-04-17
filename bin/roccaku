@@ -14,9 +14,10 @@ opts my $config_path => { isa => 'Str', default => qq{config.yaml}, },
      my $not_backup  => { isa => 'Bool' },
      my $debug       => { isa => 'Bool' },
      my $test_only   => { isa => 'Bool' },
-     my $host        => { isa => 'Str'  };
+     my $host        => { isa => 'Str'  },
+     my $argv        => { isa => 'Str', default => "",  };
 
-my $r6 = Roccaku->new( $config_path, +{ debug => $debug } );
+my $r6 = Roccaku->new( $config_path, +{ debug => $debug, argv => $argv, } );
 
 $r6->test_only( $test_only );
 

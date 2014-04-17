@@ -53,16 +53,34 @@ sub new {
               debug       => 0,
               run_objects => [],
               config_path => $config_path,
+              argv        => +{},
             }, $class;
 
   {
     no strict 'refs';
-    $obj->debug( $option->{debug} );
+    $obj->debug( $option->{debug}      );
+    $obj->argv_parser( $option->{argv} );
   }
 
   $obj->parse;
   return $obj;
 
+}
+
+sub _template_render {
+  my $self = shift;
+  my $path = shift;
+  open my $fh, "<", $path
+    or croak "$path cannot open";
+  my $data = do { local $/; <$fh> };
+
+  my $argv = $self->argv;
+warn Dumper $argv;
+  while (my ($key, $value) = each %$argv) {
+    $data =~ s{%%$key%%}{$value}g;
+  }
+
+  return $data;
 }
 
 sub parse {
@@ -71,7 +89,7 @@ sub parse {
   my $config;
   local $@;
   eval {
-    $config = YAML::LoadFile( $self->{config_path} );
+    $config = YAML::Load( $self->_template_render( $self->{config_path} ) );
     warn Dumper $config if $self->debug;
   };
   if ($@) {
@@ -85,7 +103,6 @@ sub parse {
       my $value = $c->{$name};
       my $module_name      = ucfirst $name;
       my $full_module_name = qq{Roccaku::Run::} . $module_name;
-      warn "module name: ", $full_module_name if $self->debug;
 
       {
         local $@;
@@ -98,8 +115,6 @@ sub parse {
     }
     push @objects, $hash_ref;
   }
-
-  warn Dumper \@objects if $self->debug;
 
   $self->{run_objects} = \@objects;
   return $self;
@@ -163,6 +178,37 @@ sub debug {
   }
 
   return $self->{debug};
+
+}
+
+sub argv {
+  my $self = shift;
+  my $ref  = shift;
+
+  if (defined $ref and ref $ref eq q{HASH}) {
+    $self->{argv} = $ref;
+  }
+
+  return $self->{argv};
+
+}
+
+sub argv_parser {
+  my ($self, $argv) = @_;
+
+  $argv or return;
+
+  my %argv_hash;
+  {
+    for my $v (split /,/, $argv) {
+      my ($key, $value) = $v =~ /([^\=]+)\s*\=\s*(.+)/;
+      eval { $argv_hash{$key} = $value };
+    }
+  }
+
+  $self->argv( \%argv_hash );
+
+  return %argv_hash;
 
 }
 
