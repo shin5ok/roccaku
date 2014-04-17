@@ -79,8 +79,8 @@ sub command {
       my $stderr = do { local $/; defined $e and <$e> };
       my $stdout = do { local $/; defined $r and <$r> };
 
-      $stdout ||= qq{};
-      $stderr ||= qq{};
+      $stdout ||= qq{none};
+      $stderr ||= qq{none};
       $self->logging( $stdout );
       $self->fail( "command: $command (stderr: $stderr)" );
       return undef;

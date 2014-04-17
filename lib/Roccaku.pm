@@ -75,7 +75,7 @@ sub _template_render {
   my $data = do { local $/; <$fh> };
 
   my $argv = $self->argv;
-warn Dumper $argv;
+
   while (my ($key, $value) = each %$argv) {
     $data =~ s{%%$key%%}{$value}g;
   }
@@ -187,6 +187,11 @@ sub argv {
 
   if (defined $ref and ref $ref eq q{HASH}) {
     $self->{argv} = $ref;
+  }
+
+  {
+    warn "## argv"            if $self->debug;
+    warn Dumper $self->{argv} if $self->debug;
   }
 
   return $self->{argv};
