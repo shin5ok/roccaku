@@ -1,22 +1,24 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use opts;
 use FindBin;
 use Data::Dumper;
 
+use Getopt::Long;
 use lib qq($FindBin::Bin/../lib);
 use Roccaku;
 use Roccaku::Utils;
 
 our @command_args = @ARGV;
 
-opts my $config_path => { isa => 'Str', default => qq{config.yaml}, },
-     my $not_backup  => { isa => 'Bool' },
-     my $debug       => { isa => 'Bool' },
-     my $test_only   => { isa => 'Bool' },
-     my $host        => { isa => 'Str'  },
-     my $argv        => { isa => 'Str', default => "",  };
+my ($config_path, $not_backup, $debug, $test_only, $host, $argv);
+GetOptions(
+  "config_path=s" => \$config_path,
+  "not_backup=s"  => \$not_backup,
+  "debug"         => \$debug,
+  "test_only"     => \$test_only,
+  "argv=s"        => \$argv,
+);
 
 my $r6 = Roccaku->new( $config_path, +{ debug => $debug, argv => $argv, } );
 

@@ -10,7 +10,7 @@ use POSIX qw(strftime);
 use Carp;
 use IPC::Open3;
 
-use lib  qq($FindBin::Bin/../lib);
+use lib qq($FindBin::Bin/../lib);
 use Roccaku::Utils ();
 
 our $__GEN_SORT = 20;

@@ -5,7 +5,8 @@ use strict;
 use warnings FATAL => 'all';
 
 use File::Temp;
-use lib  qq($FindBin::Bin/../lib);
+use FindBin;
+use lib qq($FindBin::Bin/../lib);
 
 use Roccaku::Utils;
 
