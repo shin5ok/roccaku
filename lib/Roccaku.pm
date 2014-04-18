@@ -44,6 +44,8 @@ use FindBin;
 use lib qq($FindBin::Bin/../lib);
 use Roccaku::Utils;
 
+our $__GEN_SORT = 10;
+
 sub new {
   my ($class, $config_path, $option) = @_;
 

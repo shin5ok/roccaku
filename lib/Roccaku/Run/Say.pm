@@ -8,6 +8,8 @@ use lib  qq($FindBin::Bin/../lib);
 use Roccaku::Run::Base;
 use base qw( Roccaku::Run::Base );
 
+our $__GEN_SORT = 50;
+
 our $SAY_NUMBER = 0;
 
 sub favor {

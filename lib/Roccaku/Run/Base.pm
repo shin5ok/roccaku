@@ -13,6 +13,8 @@ use IPC::Open3;
 use lib  qq($FindBin::Bin/../lib);
 use Roccaku::Utils ();
 
+our $__GEN_SORT = 20;
+
 sub new {
   my ($class, $params) = @_;
 

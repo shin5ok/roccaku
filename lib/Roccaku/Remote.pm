@@ -12,6 +12,8 @@ use lib qq($FindBin::Bin/../lib);
 
 our %gen_code;
 
+### no need ### our $__GEN_SORT = 250;
+
 sub run {
   my ($self) = @_;
 
@@ -20,9 +22,14 @@ sub run {
   my $lib_path = dirname ( File::Spec->rel2abs( __FILE__ ) );
   find( \&generating_code, "$lib_path/../" );
 
-  use Data::Dumper; warn Data::Dumper::Dumper ( \%gen_code );
+  for my $c ( sort { $a <=> $b } keys %gen_code ) {
+    $code .= $gen_code{$c};
+  }
 
-  # $code .= "1;\n";
+  $code .= "1;\n";
+
+  warn $code;
+  return $code;
 
 }
 
@@ -35,10 +42,10 @@ sub generating_code {
   open my $fh, "<", $f
     or return;
   # default 100
-  my $gen_sort_num = 100;
+  my $gen_sort_num;
   my $code = qq{};
   while (my $line = <$fh>) {
-    if ($line =~ m{^\s* my \s+ \$GEN_SORT \s* \= \s* (\d+) }x) {
+    if ($line =~ m{^\s* our \s+ \$__GEN_SORT \s* \= \s* (\d+) }x) {
       $gen_sort_num = eval { $1 };
     }
     $line =~ m{^1\s*\;\s*\#} and next;
@@ -48,10 +55,14 @@ sub generating_code {
   }
   close $fh;
 
+  defined $gen_sort_num or return;
+
   $code .= "\n";
 
-  no strict 'refs';
-  $gen_code{$gen_sort_num} .= $code;
+  {
+    no strict 'refs';
+    $gen_code{$gen_sort_num} .= $code;
+  }
 
   return;
 }

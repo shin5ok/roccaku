@@ -10,6 +10,8 @@ use lib  qq($FindBin::Bin/../lib);
 use Roccaku::Run::Base;
 use base qw( Roccaku::Run::Base );
 
+our $__GEN_SORT = 50;
+
 sub favor {
   my ($self, @args) = @_;
   $self->logging("[Do]: try to fix", "stderr");

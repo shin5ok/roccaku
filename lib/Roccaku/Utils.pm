@@ -9,6 +9,8 @@ use Sys::Syslog qw(:DEFAULT setlogsock);
 our $SYSLOG_FACILITY = q{local1};
 our $SYSLOG_LEVEL    = q{info};
 
+our $__GEN_SORT = 10;
+
 sub import {
   my $caller = caller;
   no strict 'refs';
