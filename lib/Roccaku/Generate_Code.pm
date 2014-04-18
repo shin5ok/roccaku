@@ -32,14 +32,12 @@ sub run {
   }
 
   $code .= "\n";
-  # warn $lib_path;
-
-  warn "$lib_path " if defined $lib_path;
-  $code .= generating_code( "$lib_path/../../bin/roccaku" );
+  $code .= generating_code( "$lib_path/../bin/roccaku" );
   $code .= "\n__END__\n";
-  $code .= generating_code( $self->{config_path} );
+  if (exists $self->{config_path}) {
+    $code .= generating_code( $self->{config_path} );
+  }
 
-  warn $code;
   return $code;
 
 }
@@ -52,7 +50,7 @@ sub generating_code {
     or return qq{};
 
   open my $fh, "<", $f
-    or return;
+    or return qq{};
   # default 100
   my $gen_sort_num;
   my $code = qq{};
@@ -69,7 +67,7 @@ sub generating_code {
   }
   close $fh;
 
-  defined $gen_sort_num or return qq{};
+  defined $gen_sort_num or return;
 
   $code .= "\n";
 
@@ -78,7 +76,7 @@ sub generating_code {
     $gen_code{$gen_sort_num} .= $code;
   }
 
-  return $gen_code{$gen_sort_num};
+  return $code;
 }
 
 sub get_datetime_comment {

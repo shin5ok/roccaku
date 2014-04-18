@@ -75,9 +75,16 @@ sub new {
 sub _template_render {
   my $self = shift;
   my $path = shift;
-  open my $fh, "<", $path
-    or croak "$path cannot open";
-  my $data = do { local $/; <$fh> };
+
+  my $data;
+  if ($path ne q{DATA}) {
+    open my $fh, "<", $path
+      or croak "$path cannot open";
+    $data = do { local $/; <$fh> };
+  } else {
+    no warnings;
+    $data = do { local $/; <DATA>; };
+  }
 
   my $argv = $self->argv;
 
