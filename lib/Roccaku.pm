@@ -40,8 +40,9 @@ if you don't export anything, such as for a purely object-oriented module.
 use Data::Dumper;
 use YAML;
 use Carp;
-use lib  qq($FindBin::Bin/../lib);
-use base qw( Roccaku::Utils );
+use FindBin;
+use lib qq($FindBin::Bin/../lib);
+use Roccaku::Utils;
 
 sub new {
   my ($class, $config_path, $option) = @_;

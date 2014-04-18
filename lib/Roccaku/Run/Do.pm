@@ -7,6 +7,7 @@ use warnings FATAL => 'all';
 use Carp;
 
 use lib  qq($FindBin::Bin/../lib);
+use Roccaku::Run::Base;
 use base qw( Roccaku::Run::Base );
 
 sub favor {
