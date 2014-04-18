@@ -7,6 +7,7 @@ use Data::Dumper;
 
 use lib qq($FindBin::Bin/../lib);
 use Roccaku;
+use Roccaku::Utils;
 
 our @argv = @ARGV;
 
@@ -19,6 +20,7 @@ opts my $config_path => { isa => 'Str', default => qq{config.yaml}, },
 
 my $r6 = Roccaku->new( $config_path, +{ debug => $debug, argv => $argv, } );
 
+logging("$0 " . join " ", @argv);
 $r6->test_only( $test_only );
 
 __FOR_CLI_OUTPUT__: {

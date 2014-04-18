@@ -10,8 +10,8 @@ use POSIX qw(strftime);
 use Carp;
 use IPC::Open3;
 
-our $SYSLOG_FACILITY = q{local1};
-our $SYSLOG_LEVEL    = q{info};
+use lib  qq($FindBin::Bin/../lib);
+use Roccaku::Utils ();
 
 sub new {
   my ($class, $params) = @_;
@@ -42,16 +42,6 @@ sub run {
 
 }
 
-sub logging {
-  my ($self, $string, $stderr) = @_;
-  openlog __FILE__, q{ndelay,pid}, $SYSLOG_FACILITY;
-  setlogsock 'unix';
-  syslog $SYSLOG_LEVEL, qq{$string};
-  closelog;
-  print {*STDERR} "\t$string\n" if $stderr;
-
-}
-
 sub params {
   my ($self, $params) = @_;
   if (defined $params) {
@@ -68,7 +58,7 @@ sub command {
   my ($self, $command) = @_;
   my ($w, $r, $e);
   $command ||= "/bin/false";
-  $self->logging("[try to exec]: $command");
+  logging("[try to exec]: $command");
   my $pid = open3 $w, $r, $e, $command; # It might have a deadlock problem
 
   if ($pid != 0) {
@@ -81,7 +71,7 @@ sub command {
 
       $stdout ||= qq{none};
       $stderr ||= qq{none};
-      $self->logging( $stdout );
+      logging( $stdout );
       $self->fail( "command: $command (stderr: $stderr)" );
       return undef;
     }
@@ -115,6 +105,11 @@ sub fail {
 
   return @{$self->{fail}} if wantarray;
   return   $self->{fail};
+}
+
+sub logging {
+  my $self = shift;
+  goto &Roccaku::Utils::logging;
 }
 
 1; # End of Roccaku
