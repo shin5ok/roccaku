@@ -4,7 +4,9 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 
+use POSIX qw(strftime);
 use File::Find;
+use File::Basename;
 use FindBin;
 use lib qq($FindBin::Bin/../lib);
 
@@ -13,14 +15,16 @@ our $code = qq{};
 sub run {
   my ($self) = @_;
 
-  my $lib_path = qq($FindBin::Bin/../lib);
-  find( \&compiling_code, $lib_path );
+  $code ||= get_datetime_comment();
 
-  warn $code;
+  my $lib_path = dirname ( File::Spec->rel2abs( __FILE__ ) );
+  find( \&generating_code, "$lib_path/../" );
+
+  $code .= "1;\n";
 
 }
 
-sub compiling_code {
+sub generating_code {
   my $f = $File::Find::name;
   (-f $f and $f =~ /\.pm$/) or return;
   open my $fh, "<", $f
@@ -34,6 +38,11 @@ sub compiling_code {
   $code .= "\n";
   close $fh;
   return;
+}
+
+sub get_datetime_comment {
+  my $datetime = strftime "%Y-%m-%d %H:%M:%S", localtime;
+  "########## " . $datetime . " ##########\n\n";
 }
 
 1; # End of Roccaku::Remote;
