@@ -13,10 +13,10 @@ our @command_args = @ARGV;
 
 my ($config_path, $not_backup, $debug, $test_only, $host, $argv);
 GetOptions(
-  "config_path=s" => \$config_path,
-  "not_backup=s"  => \$not_backup,
+  "config-path=s" => \$config_path,
+  "not-backup=s"  => \$not_backup,
   "debug"         => \$debug,
-  "test_only"     => \$test_only,
+  "test-only"     => \$test_only,
   "argv=s"        => \$argv,
 );
 
