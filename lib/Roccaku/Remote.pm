@@ -6,6 +6,7 @@ use warnings FATAL => 'all';
 
 use POSIX qw(strftime);
 use FindBin;
+use File::Spec;
 use File::Basename;
 use lib qq($FindBin::Bin/../lib);
 
@@ -15,18 +16,35 @@ our $sudo = qq{};
 
 our $temporary_working_base = q{/var/tmp};
 
-sub run {
-  my ($self, $host, $command_argv) = @_;
+sub new {
+  my ($class, $host, $command_argv) = @_;
   my $temporary_working_dir = _gen_working_dir();
-  my $scp = "$sudo scp -r $path/ $host:$temporary_working_dir/$path";
-  my $run = sprintf "$sudo ssh %s %s/bin/roccaku %s",
+  my $path = exists $ENV{ROCCAKU_ROOT_PATH}
+           ? $ENV{ROCCAKU_ROOT_PATH}
+           : qq{$ENV{HOME}/roccaku};
+
+  my $scp = "scp -r $path/ $host:$temporary_working_dir/$path";
+  my $run = sprintf "ssh %s $sudo %s/bin/roccaku %s",
                      $host,
                      $path,
                      ( join " ", @$command_argv );
-  my $rmd = "rm -Rf $temporary_working_dir";
+  my $rmd = "ssh $host rm -Rf $temporary_working_dir";
+
+  my @cmds;
   push @cmds, ( qq{$scp}, qq{$run}, qq{$rmd} );
 
-  for my $cmd ( @cmds ) {
+  bless {
+    host => $host,
+    cmds => \@cmds,
+  }, $class;
+
+}
+
+sub run {
+  my $self    = shift;
+  my $cmd_ref = $self->{cmds};
+
+  for my $cmd ( @{$cmd_ref} ) {
     my $r = (system $cmd) == 0
           ? "ok"
           : "ERROR";
@@ -39,7 +57,7 @@ sub _gen_working_dir {
   my $uuid = `uuidgen 2> /dev/null`;
   chomp $uuid;
   $uuid ||= strftime "%Y%m%d%H%M%S", localtime;
-  sprintf "%s/.%s_%s", $temporary_working_base, basename $0, $uuid;
+  sprintf "%s/.%s_%s", $temporary_working_base, ( basename __FILE__) , $uuid;
 }
 
 1; # End of Roccaku::Say;

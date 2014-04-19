@@ -11,6 +11,7 @@ use warnings FATAL => 'all';
 use POSIX qw(strftime);
 use File::Find;
 use File::Basename;
+use File::Spec;
 use FindBin;
 use lib qq($FindBin::Bin/../lib);
 
