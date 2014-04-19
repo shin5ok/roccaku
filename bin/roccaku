@@ -18,6 +18,7 @@ GetOptions(
   "debug"         => \$debug,
   "test-only"     => \$test_only,
   "argv=s"        => \$argv,
+  "host=s"        => \$host,
 );
 
 my $r6 = Roccaku->new( $config_path, +{ debug => $debug, argv => $argv, } );

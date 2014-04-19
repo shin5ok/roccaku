@@ -34,6 +34,7 @@ sub run {
   $code .= "\n";
   $code .= generating_code( "$lib_path/../bin/roccaku" );
   $code .= "\n__END__\n";
+  no strict 'refs';
   if (exists $self->{config_path}) {
     $code .= generating_code( $self->{config_path} );
   }
