@@ -23,10 +23,10 @@ sub run {
            ? $ENV{ROCCAKU_ROOT_PATH}
            : qq{$ENV{HOME}/roccaku};
 
-  my $scp = "scp -r $path/ $host:$temporary_working_dir/$path";
+  my $scp = "scp -r $path/ $host:$temporary_working_dir/";
   my $run = sprintf "ssh %s $sudo %s/bin/roccaku %s",
                      $host,
-                     $path,
+                     $temporary_working_dir,
                      ( join " ", @$command_argv );
   my $rmd = "ssh $host rm -Rf $temporary_working_dir";
 
@@ -34,6 +34,7 @@ sub run {
   push @cmds, ( qq{$scp}, qq{$run}, qq{$rmd} );
 
   for my $cmd ( @cmds ) {
+    warn $cmd;
     my $r = (system $cmd) == 0
           ? "ok"
           : "ERROR";
