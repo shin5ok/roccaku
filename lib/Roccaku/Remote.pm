@@ -16,8 +16,8 @@ our $sudo = qq{};
 
 our $temporary_working_base = q{/var/tmp};
 
-sub new {
-  my ($class, $host, $command_argv) = @_;
+sub run {
+  my ($host, $command_argv) = @_;
   my $temporary_working_dir = _gen_working_dir();
   my $path = exists $ENV{ROCCAKU_ROOT_PATH}
            ? $ENV{ROCCAKU_ROOT_PATH}
@@ -33,18 +33,7 @@ sub new {
   my @cmds;
   push @cmds, ( qq{$scp}, qq{$run}, qq{$rmd} );
 
-  bless {
-    host => $host,
-    cmds => \@cmds,
-  }, $class;
-
-}
-
-sub run {
-  my $self    = shift;
-  my $cmd_ref = $self->{cmds};
-
-  for my $cmd ( @{$cmd_ref} ) {
+  for my $cmd ( @cmds ) {
     my $r = (system $cmd) == 0
           ? "ok"
           : "ERROR";

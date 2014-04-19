@@ -133,8 +133,14 @@ sub parse {
 }
 
 sub run {
-  # If defined $host, run() method exec on remote $host
-  my ($self, $host) = @_;
+  my $self = shift;
+  my ($host, $command_args_ref) = @_;
+
+  if (defined $host) {
+    # If defined $host, run() method exec on remote $host
+    require Roccaku::Remote;
+    goto \&Roccaku::Remote::run;
+  }
 
   my $test_only = $self->test_only;
 
