@@ -136,50 +136,57 @@ sub run {
   my $self = shift;
   my ($host, $command_args_ref) = @_;
 
-  if (defined $host) {
-    # If defined $host, run() method exec on remote $host
-    require Roccaku::Remote;
-    goto \&Roccaku::Remote::run;
-  }
+  # if (defined $host) {
+  #   # If defined $host, run() method exec on remote $host
+  #   require Roccaku::Remote;
+  #   goto \&Roccaku::Remote::run;
+  # }
 
   my $test_only = $self->test_only;
 
-  my (@must_fails, @do_fails);
+  my @results;
+  my $fail_count = 0;
+
   my $run_objects = $self->{run_objects};
   for my $ref ( @{$run_objects} ) {
+    my $result = +{ comment => q{}, fail => { must => [], do => [] } };
+    my $comment;
     if (exists $ref->{say}) {
       my $say = $ref->{say};
-      $say->run;
+      $comment = $say->run;
     } else {
       require Roccaku::Run::Say;
-      Roccaku::Run::Say->new( "(Next process)" )->run;
+      $comment = Roccaku::Run::Say->new( "(Next process)" )->run;
     }
+    $result->{comment} = $comment;
+
     if (exists $ref->{must}) {
       my $must = $ref->{must};
       my $is_must = $must->run;
-      push @must_fails, $must->fail;
+      if ((my @fails = $must->fail) > 0) {
+        push @{$result->{fail}->{must}}, @fails;
+        $fail_count++;
+      }
 
       if (not $is_must and exists $ref->{do} and not $self->test_only) {
         my $do = $ref->{do};
         $do->run;
-        push @do_fails, $do->fail;
+        if (my @fails = $do->fail > 0) {
+          push @{$result->{fail}->{do}}, @fails;
+          $fail_count++;
+        }
       }
     }
+    push @results, $result;
   }
 
-  my $result_ref = +{
-                       success => +{
-                                     must => @must_fails == 0,
-                                     do   => @do_fails   == 0,
-                                   },
-                       fail => +{
-                         must => \@must_fails,
-                         do   => \@do_fails,
-                       }
-                     };
+  warn Dumper \@results;
 
+  # warn Dumper $result_ref;
+  # return $result_ref;
+  my $ok = $fail_count == 0 ? 1 : 0;
   require Roccaku::Result;
-  return Roccaku::Result->new( $result_ref );
+  return Roccaku::Result->new( +{ ok => $ok, results => \@results } );
 
 }
 

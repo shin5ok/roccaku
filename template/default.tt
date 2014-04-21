@@ -1,0 +1,54 @@
+---
+[% FOREACH r = results -%]
+[% num -%]: [% comment -%]
+  [% IF r.fail.must > 0 -%]
+    [% FOREACH f = r.fail.must -%]
+      [FAIL]: [% f %]
+    [% END -%]
+  [% END -%]
+[% END -%]
+    2: postfix installed
+    3: postfix running
+    4: perl-Sys-Guestfs installed
+    5: postfix is ready to start
+    6: postfix main.cf is configured
+    7: murakumo directory check
+	[FAIL]: command: test -d /home/smc/murakumo_node (stderr: none)
+    8: murakumo_node_api running
+	[FAIL]: command: ps ax | grep Murakumo_Node_server | grep -v grep (stderr: none)
+    9: murakumo_node_job running
+	[FAIL]: command: ps ax | grep murakumo_node_job | grep -v grep (stderr: none)
+   10: murakumo_node_submit running
+	[FAIL]: command: ps ax | grep murakumo_node_submit | grep -v grep (stderr: none)
+   11: munin-node installed
+   12: nrpe installed
+   13: ntp cron setup
+   14: ntpdate installed
+   15: munin-node.conf cidr_allow
+   16: selinux check
+   17: kernel parameter config
+   18: kernel parameter runtime
+   19: routing check conf
+   20: routing check runtime
+   21: user check
+	[FAIL]: command: grep ^miyamoto     /etc/passwd (stderr: none)
+	[FAIL]: command: grep ^d\-inoue     /etc/passwd (stderr: none)
+	[FAIL]: command: grep ^k\-nishiyama /etc/passwd (stderr: none)
+	[FAIL]: command: grep ^morisaki     /etc/passwd (stderr: none)
+	[FAIL]: command: grep ^kawasaki     /etc/passwd (stderr: none)
+	[FAIL]: /etc/sudoers don't have line ^SMC_USERS\s+ALL\=\(ALL\)\s+ALL
+	[FAIL]: /etc/sudoers don't have line ^nagios\s+ALL\=\(ALL\)\s+NOPASSWD:\s*ALL
+   22: sudoers check
+   23: megasasctl available
+	[FAIL]: command: test -x /usr/sbin/megasasctl (stderr: none)
+   24: /var/SMC/cron check
+   25: check_raid nagios file
+	[FAIL]: command: test -l /usr/local/nagios/libexec/check_raid (stderr: none)
+   26: perl modules
+   27: aliases check
+	[FAIL]: command: db_dump -p /etc/aliases.db | grep '^root:\ managed\-system\@nttsmc.com' (stderr: none)
+	[FAIL]: /etc/rsyslog.conf don't have line ^local0\.\*.+/murakumo_node_api\.log
+   28: rsyslog.conf check
+   29: libvirt valid version installed
+
+  MUST checking has some errors.

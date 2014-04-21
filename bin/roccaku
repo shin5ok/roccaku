@@ -35,34 +35,35 @@ __FOR_CLI_OUTPUT__: {
   printf "\n\n";
 }
 
-my $result = $r6->run( $host, \@command_args );
+print $r6->run( $host, \@command_args )->json;
+print "\n";
 
-__FOR_CLI_RESULT__: {
-  local $| = 1;
-  no strict 'refs';
-  print "\n";
-  if ($result->{success}->{must} and $result->{success}->{do}) {
-    print "  all processes was successfully.\n";
-    exit 0;
-  }
-  elsif ($result->{success}->{must}) {
-    print "  all MUST checking was successfully.\n";
-    exit 0;
-  }
-  elsif (! $result->{success}->{must}) {
-    print "  MUST checking has some errors.\n";
-    if (! $r6->test_only) {
-      printf "  But Just now, try to run Configure processes.\n";
-      printf "  Run this command again to confirm them.\n";
-      printf "  \$ sudo $0 %s -t(--test-only)\n", (join " ", @command_args);
-      exit 0;
-    }
-    exit 1;
-  }
-  elsif (! $result->{success}->{do}) {
-    print "  Configuring process did have some errors.\n";
-    exit 1;
-  }
-}
+# __FOR_CLI_RESULT__: {
+#   local $| = 1;
+#   no strict 'refs';
+#   print "\n";
+#   if ($result->{success}->{must} and $result->{success}->{do}) {
+#     print "  all processes was successfully.\n";
+#     exit 0;
+#   }
+#   elsif ($result->{success}->{must}) {
+#     print "  all MUST checking was successfully.\n";
+#     exit 0;
+#   }
+#   elsif (! $result->{success}->{must}) {
+#     print "  MUST checking has some errors.\n";
+#     if (! $r6->test_only) {
+#       printf "  But Just now, try to run Configure processes.\n";
+#       printf "  Run this command again to confirm them.\n";
+#       printf "  \$ sudo $0 %s -t(--test-only)\n", (join " ", @command_args);
+#       exit 0;
+#     }
+#     exit 1;
+#   }
+#   elsif (! $result->{success}->{do}) {
+#     print "  Configuring process did have some errors.\n";
+#     exit 1;
+#   }
+# }
 
 

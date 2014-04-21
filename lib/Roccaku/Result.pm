@@ -22,7 +22,7 @@ sub new {
 
 sub json {
   my $self = shift;
-  return decode_json $self->result;
+  return encode_json ( $self->result );
 }
 
 sub result {
@@ -34,8 +34,10 @@ sub result {
 }
 
 sub text_template {
+  my ($self, $template_path) = @_;
+  $template_path ||= qq{$FindBin::Bin/../template/default.tt};
   require Template;
-  my $tt = Template->new;
+  my $tt = Template->new( { RELATIVE => 1 } );
   $tt->process( $template_path, $self->result );
 
 }
