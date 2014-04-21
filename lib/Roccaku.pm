@@ -167,16 +167,20 @@ sub run {
     }
   }
 
-  return +{
-            success => +{
-                          must => @must_fails == 0,
-                          do   => @do_fails   == 0,
-                        },
-            fail => +{
-              must => \@must_fails,
-              do   => \@do_fails,
-            }
-          };
+  my $result_ref = +{
+                       success => +{
+                                     must => @must_fails == 0,
+                                     do   => @do_fails   == 0,
+                                   },
+                       fail => +{
+                         must => \@must_fails,
+                         do   => \@do_fails,
+                       }
+                     };
+
+  require Roccaku::Result;
+  return Roccaku::Result->new( $result_ref );
+
 }
 
 sub test_only {
