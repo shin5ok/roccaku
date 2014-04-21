@@ -15,11 +15,13 @@ our $SAY_NUMBER = 0;
 sub favor {
   my ($self, @strings) = @_;
 
+  my @says;
   for my $string ( @strings ) {
-    $SAY_NUMBER++;
-    printf "%5d: %s\n", $SAY_NUMBER, $string;
+    my $string_formatted = sprintf "%5d: $string", ++$SAY_NUMBER;
+    $self->logging( $string_formatted );
   }
-
+  return $says[0] if @says == 1;
+  return \@says;
 }
 
 1; # End of Roccaku::Say;

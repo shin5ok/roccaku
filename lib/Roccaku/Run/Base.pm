@@ -10,16 +10,18 @@ use POSIX qw(strftime);
 use Carp;
 use IPC::Open3;
 
+use FindBin;
 use lib qq($FindBin::Bin/../lib);
 use Roccaku::Utils ();
 
 our $__GEN_SORT = 20;
 
 sub new {
-  my ($class, $params) = @_;
+  my ($class, $params, $option) = @_;
 
   my $obj = bless +{ fail => [] }, $class;
   $obj->params( $params );
+  $obj->option( $option );
 
   return $obj;
 }
@@ -33,14 +35,14 @@ sub run {
            ? @$params
            : $params;
 
-  $self->favor( @args );
+  my @results = $self->favor( @args );
 
   my @fails = $self->fail;
   if (@fails > 0) {
-    $self->logging("[FAIL]: $_", "__STDERR__") for @fails;
-    return 0;
+    # if api_mode is true, no output to stderr
+    $self->logging("\t[FAIL]: $_") for @fails;
   }
-  return 1;
+  return @results;
 
 }
 
@@ -50,6 +52,14 @@ sub params {
     $self->{params} = $params;
   }
   return $self->{params};
+}
+
+sub option {
+  my ($self, $option) = @_;
+  if (defined $option) {
+    $self->{option} = $option
+  }
+  return $self->{option};
 }
 
 sub favor {
@@ -73,7 +83,7 @@ sub command {
 
       $stdout ||= qq{none};
       $stderr ||= qq{none};
-      logging( $stdout );
+      # $self->logging( $stdout );
       $self->fail( "command: $command (stderr: $stderr)" );
       return undef;
     }
@@ -110,8 +120,28 @@ sub fail {
 }
 
 sub logging {
-  my $self = shift;
-  goto &Roccaku::Utils::logging;
+  my $self     = shift;
+  my $string   = shift;
+  no strict 'refs';
+  my $api_mode = $self->{option}->{api_mode} ? 1 : 0;
+  Roccaku::Utils::logging( $string, not $api_mode );
 }
+
+our $AUTOLOAD;
+sub AUTOLOAD {
+  my ($method) = $AUTOLOAD =~ /::([^(?:::)]+)$/;
+  no strict 'refs';
+  *{$AUTOLOAD} = sub {
+    my $self = shift;
+    my $argv = shift;
+    if (defined $argv) {
+      $self->{option}->{$method} = $argv;
+    }
+    return $self->{option}->{$method} || undef;
+  };
+  goto &$AUTOLOAD;
+}
+
+sub DESTROY {}
 
 1; # End of Roccaku

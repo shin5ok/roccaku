@@ -55,6 +55,7 @@ sub new {
 
   my $obj = bless {
               test_only   => undef,
+              api_mode    => undef,
               debug       => 0,
               run_objects => [],
               config_path => $config_path,
@@ -63,8 +64,9 @@ sub new {
 
   {
     no strict 'refs';
-    $obj->debug( $option->{debug}      );
-    $obj->argv_parser( $option->{argv} );
+    $obj->debug( $option->{debug}       );
+    $obj->argv_parser( $option->{argv}  );
+    $obj->api_mode( $option->{api_mode} );
   }
 
   $obj->parse;
@@ -122,14 +124,16 @@ sub parse {
         if ($@) {
           croak "$full_module_name was load failure($@)";
         }
-        $hash_ref->{$name} = $full_module_name->new( $value );
+        $hash_ref->{$name} = $full_module_name->new( $value, { api_mode => $self->api_mode } );
       }
     }
     push @objects, $hash_ref;
   }
 
   $self->{run_objects} = \@objects;
+
   return $self;
+
 }
 
 sub run {
@@ -180,13 +184,21 @@ sub run {
     push @results, $result;
   }
 
-  warn Dumper \@results;
+  # warn Dumper \@results;
 
-  # warn Dumper $result_ref;
-  # return $result_ref;
   my $ok = $fail_count == 0 ? 1 : 0;
   require Roccaku::Result;
   return Roccaku::Result->new( +{ ok => $ok, results => \@results } );
+
+}
+
+sub api_mode {
+  my ($self, $flag) = @_;
+  if (@_ == 2) {
+    $self->{api_mode} = $flag;
+  }
+
+  return $self->{api_mode};
 
 }
 

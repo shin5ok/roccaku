@@ -27,7 +27,7 @@ sub logging {
   setlogsock 'unix';
   syslog $SYSLOG_LEVEL, qq{$string};
   closelog;
-  print {*STDERR} "\t$string\n" if $stderr;
+  print {*STDERR} "$string\n" if $stderr and $string;
 
 }
 
