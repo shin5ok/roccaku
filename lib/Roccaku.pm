@@ -41,7 +41,8 @@ use Data::Dumper;
 use YAML;
 use Carp;
 use FindBin;
-use lib qq($FindBin::Bin/../lib);
+use lib (qq($FindBin::Bin/../lib), qq($FindBin::Bin/../extlib));
+use JSON::PP;
 use Roccaku::Utils;
 
 our $__GEN_SORT = 10;
@@ -142,10 +143,15 @@ sub run {
 
   if (defined $host) {
     # If defined $host, run() method exec on remote $host
+    local $@;
+    my $r;
     require Roccaku::Remote;
-    my $r = Roccaku::Remote::run( $host, $command_args_ref );
-    warn Data::Dumper::Dumper $r;
-    # exit;
+    eval {
+      warn `hostname`;
+      $r = Roccaku::Remote::run( $host, $command_args_ref );
+      warn Data::Dumper::Dumper ($r);
+    };
+    warn $@ if $@;
   }
 
   my $test_only = $self->test_only;

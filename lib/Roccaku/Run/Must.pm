@@ -26,7 +26,8 @@ sub favor {
 
 sub file {
   my ($self, $argv) = @_;
-  if (! open my $fh, "<", $argv->{path}) {
+  my $fh;
+  if (! open $fh, "<", $argv->{path}) {
     $self->fail("$argv->{path} cannot open");
     return 0;
   }

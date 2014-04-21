@@ -5,9 +5,9 @@ use strict;
 use warnings FATAL => 'all';
 
 use POSIX qw(strftime);
-use JSON::PP;
 use FindBin;
 use lib (qq($FindBin::Bin/../lib), qq($FindBin::Bin/../extlib));
+use JSON::PP;
 
 use Roccaku::Utils;
 

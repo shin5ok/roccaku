@@ -5,10 +5,12 @@ use strict;
 use warnings FATAL => 'all';
 
 use POSIX qw(strftime);
+use Carp;
 use FindBin;
 use File::Spec;
 use File::Basename;
-use lib qq($FindBin::Bin/../lib);
+use lib (qq($FindBin::Bin/../lib), qq($FindBin::Bin/../extlib));
+use JSON::PP;
 
 use Roccaku::Utils;
 
@@ -20,7 +22,8 @@ sub run {
   my ($host, $command_argv) = @_;
 
   # It's mine...not remote!
-  is_this_me($host) and return;
+  # is_this_me($host) and return +{};
+  is_this_me($host) and croak "This host is me";
 
   my $temporary_working_dir = _gen_working_dir();
   my $path = exists $ENV{ROCCAKU_ROOT_PATH}
@@ -34,19 +37,12 @@ sub run {
                      ( join " ", @$command_argv, '--api' );
   my $rmd = "ssh $host rm -Rf $temporary_working_dir";
 
-  my @cmds;
-  push @cmds, ( qq{$scp}, qq{$run}, qq{$rmd} );
-  push @cmds, ( qq{$scp}, qq{$run} );
+  system $scp;
+  my $output = qx{$run};
+  system $rmd;
 
-  for my $cmd ( @cmds ) {
-    local $?;
-    system $cmd;
-    my $r = $? == 0
-          ? "ok"
-          : "ERROR";
+  return decode_json $output;
 
-    logging "$r: $cmd", 1;
-  }
 }
 
 sub _gen_working_dir {
