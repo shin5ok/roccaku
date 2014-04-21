@@ -140,11 +140,13 @@ sub run {
   my $self = shift;
   my ($host, $command_args_ref) = @_;
 
-  # if (defined $host) {
-  #   # If defined $host, run() method exec on remote $host
-  #   require Roccaku::Remote;
-  #   goto \&Roccaku::Remote::run;
-  # }
+  if (defined $host) {
+    # If defined $host, run() method exec on remote $host
+    require Roccaku::Remote;
+    my $r = Roccaku::Remote::run( $host, $command_args_ref );
+    warn Data::Dumper::Dumper $r;
+    # exit;
+  }
 
   my $test_only = $self->test_only;
 

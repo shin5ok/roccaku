@@ -11,7 +11,7 @@ use Roccaku::Utils;
 
 our @command_args = @ARGV;
 
-my ($config_path, $not_backup, $debug, $test_only, $host, $argv);
+my ($config_path, $not_backup, $debug, $test_only, $host, $argv, $api);
 GetOptions(
   "config-path=s" => \$config_path,
   "not-backup=s"  => \$not_backup,
@@ -19,51 +19,57 @@ GetOptions(
   "test-only"     => \$test_only,
   "argv=s"        => \$argv,
   "host=s"        => \$host,
+  "api"           => \$api,
 );
 
-my $r6 = Roccaku->new( $config_path, +{ debug => $debug, argv => $argv, } );
+my $r6 = Roccaku->new( $config_path, +{ debug => $debug, argv => $argv, api_mode => $api } );
 
 logging("$0 " . join " ", @command_args);
 $r6->test_only( $test_only );
 
 __FOR_CLI_OUTPUT__: {
-  local $| = 1;
-  printf "  %s is starting to run...", ref $r6;
-  sleep 1;
-  printf "test phase only" if $r6->test_only;
-  sleep 1                  if $r6->test_only;
-  printf "\n\n";
+  if (! $api) {
+    local $| = 1;
+    printf "  %s is starting to run...", ref $r6;
+    sleep 1;
+    printf "test phase only" if $r6->test_only;
+    sleep 1                  if $r6->test_only;
+    printf "\n\n";
+  }
 }
 
-print $r6->run( $host, \@command_args )->json;
-print "\n";
+my $result = $r6->run( $host, \@command_args );
 
-# __FOR_CLI_RESULT__: {
-#   local $| = 1;
-#   no strict 'refs';
-#   print "\n";
-#   if ($result->{success}->{must} and $result->{success}->{do}) {
-#     print "  all processes was successfully.\n";
-#     exit 0;
-#   }
-#   elsif ($result->{success}->{must}) {
-#     print "  all MUST checking was successfully.\n";
-#     exit 0;
-#   }
-#   elsif (! $result->{success}->{must}) {
-#     print "  MUST checking has some errors.\n";
-#     if (! $r6->test_only) {
-#       printf "  But Just now, try to run Configure processes.\n";
-#       printf "  Run this command again to confirm them.\n";
-#       printf "  \$ sudo $0 %s -t(--test-only)\n", (join " ", @command_args);
-#       exit 0;
-#     }
-#     exit 1;
-#   }
-#   elsif (! $result->{success}->{do}) {
-#     print "  Configuring process did have some errors.\n";
-#     exit 1;
-#   }
-# }
+__FOR_CLI_RESULT__: {
+  if (! $api) {
+    local $| = 1;
+    no strict 'refs';
+    print "\n";
+    if ($result->{success}->{must} and $result->{success}->{do}) {
+      print "  all processes was successfully.\n";
+      exit 0;
+    }
+    elsif ($result->{success}->{must}) {
+      print "  all MUST checking was successfully.\n";
+      exit 0;
+    }
+    elsif (! $result->{success}->{must}) {
+      print "  MUST checking has some errors.\n";
+      if (! $r6->test_only) {
+        printf "  But Just now, try to run Configure processes.\n";
+        printf "  Run this command again to confirm them.\n";
+        printf "  \$ sudo $0 %s -t(--test-only)\n", (join " ", @command_args);
+        exit 0;
+      }
+      exit 1;
+    }
+    elsif (! $result->{success}->{do}) {
+      print "  Configuring process did have some errors.\n";
+      exit 1;
+    }
+  } else {
+    print $result->json, "\n";
+  }
+}
 
 
