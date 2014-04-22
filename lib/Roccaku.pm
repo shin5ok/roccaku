@@ -111,27 +111,32 @@ sub parse {
     croak "$self->{config_path} cannot be read($@)";
   }
 
-  my @objects;
-  for my $c ( @{$config->{run}} ) {
-    my $hash_ref = +{};
-    for my $name (keys %$c) {
-      my $value = $c->{$name};
-      my $module_name      = ucfirst $name;
-      my $full_module_name = qq{Roccaku::Run::} . $module_name;
+  my %object_hash;
+  while (my ($key, $x) = each %{$config->{run}}) {
+    my @objects;
+    for my $c (@$x) {
+      my $hash_ref = +{};
+      for my $name (keys %$c) {
+        my $value = $c->{$name};
+        my $module_name      = ucfirst $name;
+        my $full_module_name = qq{Roccaku::Run::} . $module_name;
 
-      {
-        local $@;
-        eval qq{use $full_module_name};
-        if ($@) {
-          croak "$full_module_name was load failure($@)";
+        {
+          local $@;
+          eval qq{use $full_module_name};
+          if ($@) {
+            croak "$full_module_name was load failure($@)";
+          }
+          $hash_ref->{$name} = $full_module_name->new( $value, { api_mode => $self->api_mode } );
         }
-        $hash_ref->{$name} = $full_module_name->new( $value, { api_mode => $self->api_mode } );
       }
+      push @objects, $hash_ref;
     }
-    push @objects, $hash_ref;
+    $object_hash{$key} = \@objects;
   }
 
-  $self->{run_objects} = \@objects;
+  $self->{run_objects} = \%object_hash;
+  warn Dumper \%object_hash;
 
   return $self;
 
@@ -141,13 +146,13 @@ sub run {
   my $self = shift;
   my ($host, $command_args_ref) = @_;
 
+  my $run_objects = $self->{run_objects};
   if (defined $host) {
     # If defined $host, run() method exec on remote $host
     local $@;
     my $r;
     require Roccaku::Remote;
     eval {
-      warn `hostname`;
       $r = Roccaku::Remote::run( $host, $command_args_ref );
       warn Data::Dumper::Dumper ($r);
     };
@@ -159,7 +164,6 @@ sub run {
   my @results;
   my $fail_count = 0;
 
-  my $run_objects = $self->{run_objects};
   for my $ref ( @{$run_objects} ) {
     my $result = +{ comment => q{}, fail => { must => [], do => [] } };
     my $comment;
