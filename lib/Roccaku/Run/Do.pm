@@ -14,7 +14,7 @@ our $__GEN_SORT = 50;
 
 sub favor {
   my ($self, @args) = @_;
-  $self->logging("[Do]: try to fix", "stderr");
+  $self->logging("\t[Do]: try to fix", "stderr");
 
   for my $arg ( @args ) {
     if (ref $arg eq q{HASH}) {
@@ -33,8 +33,8 @@ sub file {
   $self->file_backup( $argv->{path} )
     or croak "*** backup failure $argv->{path}";
 
-  open my $fh, "+<", $argv->{path};
-  if (! $fh) {
+  my $fh;
+  if (! open $fh, "+<", $argv->{path}) {
     $self->fail("$argv->{path} cannot open");
     return 0;
   }

@@ -42,7 +42,8 @@ sub run {
     # if api_mode is true, no output to stderr
     $self->logging("\t[FAIL]: $_") for @fails;
   }
-  return @results;
+  return @results if wantarray;
+  return $results[0];
 
 }
 

@@ -136,35 +136,45 @@ sub parse {
   }
 
   $self->{run_objects} = \%object_hash;
-  warn Dumper \%object_hash;
 
   return $self;
 
 }
 
 sub run {
-  my $self = shift;
-  my ($host, $command_args_ref) = @_;
-
-  my $run_objects = $self->{run_objects};
-  if (defined $host) {
-    # If defined $host, run() method exec on remote $host
-    local $@;
-    my $r;
-    require Roccaku::Remote;
-    eval {
-      $r = Roccaku::Remote::run( $host, $command_args_ref );
-      warn Data::Dumper::Dumper ($r);
-    };
-    warn $@ if $@;
-  }
-
-  my $test_only = $self->test_only;
+  my $self   = shift;
+  my $params = shift;
 
   my @results;
   my $fail_count = 0;
 
-  for my $ref ( @{$run_objects} ) {
+  my $run_objects = $self->{run_objects};
+  if (defined $params->{host}) {
+    # If defined host, run() method exec on remote host
+    local $@;
+    my $r;
+    require Roccaku::Remote;
+    eval {
+      my $remote_params;
+        %$remote_params = %$params;
+        my $host = delete $remote_params->{host};
+        warn Dumper $remote_params;
+
+      $r = Roccaku::Remote::run( $host, $remote_params );
+      warn Dumper $r;
+    };
+    warn $@ if $@;
+
+    push @results, @{$r->{results}}
+  }
+
+  my $test_only = $self->test_only;
+
+  my $flag = exists $params->{flag}
+           ? $params->{flag}
+           : qq{local};
+
+  for my $ref ( @{$run_objects->{$flag}} ) {
     my $result = +{ comment => q{}, fail => { must => [], do => [] } };
     my $comment;
     if (exists $ref->{say}) {
@@ -178,8 +188,10 @@ sub run {
 
     if (exists $ref->{must}) {
       my $must = $ref->{must};
-      my $is_must = $must->run;
+      $must->run;
+      my $is_must = 1;
       if ((my @fails = $must->fail) > 0) {
+        $is_must = 0;
         push @{$result->{fail}->{must}}, @fails;
         $fail_count++;
       }
@@ -195,8 +207,6 @@ sub run {
     }
     push @results, $result;
   }
-
-  # warn Dumper \@results;
 
   my $ok = $fail_count == 0 ? 1 : 0;
   require Roccaku::Result;

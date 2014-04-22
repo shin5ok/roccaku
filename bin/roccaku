@@ -21,12 +21,13 @@ GetOptions(
   "argv=s"       ,
   "host=s"       ,
   "api"          ,
+  "flag=s"       ,
 );
 
 my $r6 = Roccaku->new( $params{"config-path"}, +{ debug => $params{debug}, argv => $params{argv}, api_mode => $params{api} } );
 
 logging("$0 " . join " ", @command_args);
-$r6->test_only( $params{test_only} );
+$r6->test_only( $params{"test-only"} );
 
 __FOR_CLI_OUTPUT__: {
   if (! $params{api}) {
