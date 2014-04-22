@@ -11,24 +11,25 @@ use Roccaku::Utils;
 
 our @command_args = @ARGV;
 
-my ($config_path, $not_backup, $debug, $test_only, $host, $argv, $api);
+my %params;
 GetOptions(
-  "config-path=s" => \$config_path,
-  "not-backup=s"  => \$not_backup,
-  "debug"         => \$debug,
-  "test-only"     => \$test_only,
-  "argv=s"        => \$argv,
-  "host=s"        => \$host,
-  "api"           => \$api,
+  \%params,
+  "config-path=s",
+  "not-backup=s" ,
+  "debug"        ,
+  "test-only"    ,
+  "argv=s"       ,
+  "host=s"       ,
+  "api"          ,
 );
 
-my $r6 = Roccaku->new( $config_path, +{ debug => $debug, argv => $argv, api_mode => $api } );
+my $r6 = Roccaku->new( $params{"config-path"}, +{ debug => $params{debug}, argv => $params{argv}, api_mode => $params{api} } );
 
 logging("$0 " . join " ", @command_args);
-$r6->test_only( $test_only );
+$r6->test_only( $params{test_only} );
 
 __FOR_CLI_OUTPUT__: {
-  if (! $api) {
+  if (! $params{api}) {
     local $| = 1;
     printf "  %s is starting to run...", ref $r6;
     sleep 1;
@@ -38,10 +39,10 @@ __FOR_CLI_OUTPUT__: {
   }
 }
 
-my $result = $r6->run( $host, \@command_args );
+my $result = $r6->run( \%params );
 
 __FOR_CLI_RESULT__: {
-  if (! $api) {
+  if (! $params{api}) {
     local $| = 1;
     no strict 'refs';
     print "\n";
