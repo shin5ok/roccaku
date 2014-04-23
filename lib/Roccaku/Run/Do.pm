@@ -33,6 +33,20 @@ sub file {
   $self->file_backup( $argv->{path} )
     or croak "*** backup failure $argv->{path}";
 
+  if (exists $argv->{create}) {
+    my $cm = $argv->{create};
+    if (! open my $fh, ">", $argv->{path}) {
+      $self->fail("$argv->{path} cannot create");
+      return 0;
+    }
+    if (exists $cm->{mode}) {
+      system sprintf "chmod %s %s", $cm->{mode}, $argv->{path};
+    }
+    if (exists $cm->{owner} and exists $cm->{group}) {
+      system sprintf "chown %s:%s %s", $cm->{owner}, $cm->{group}, $argv->{path};
+    }
+  }
+
   my $fh;
   if (! open $fh, "+<", $argv->{path}) {
     $self->fail("$argv->{path} cannot open");
