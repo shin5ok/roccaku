@@ -41,8 +41,8 @@ use Data::Dumper;
 use Carp;
 use FindBin;
 use lib (qq($FindBin::Bin/../lib), qq($FindBin::Bin/../extlib));
-use JSON::PP;
 use Roccaku::Utils;
+use JSON::PP;
 
 our $__GEN_SORT = 10;
 
