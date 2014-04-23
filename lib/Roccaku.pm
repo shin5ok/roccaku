@@ -114,10 +114,10 @@ sub parse {
         my $ref  = YAML::Tiny->read_string( $self->_template_render( $self->{config_path} ) );
         $config = $ref->[0];
       };
-      warn Dumper $config if $self->debug;
       if ($@ or ! defined $config) {
         croak "$self->{config_path} cannot be read($@)";
       }
+      warn Dumper $config if $self->debug;
     }
   }
 
