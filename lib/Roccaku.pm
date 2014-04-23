@@ -38,7 +38,6 @@ if you don't export anything, such as for a purely object-oriented module.
 =cut
 
 use Data::Dumper;
-use YAML;
 use Carp;
 use FindBin;
 use lib (qq($FindBin::Bin/../lib), qq($FindBin::Bin/../extlib));
@@ -102,13 +101,24 @@ sub parse {
   my ($self) = @_;
 
   my $config;
-  local $@;
-  eval {
-    $config = YAML::Load( $self->_template_render( $self->{config_path} ) );
-    warn Dumper $config if $self->debug;
-  };
-  if ($@) {
-    croak "$self->{config_path} cannot be read($@)";
+  {
+    local $@;
+    eval {
+      require YAML;
+      $config = YAML::Load( $self->_template_render( $self->{config_path} ) );
+    };
+    if ($@ or ! defined $config) {
+      local $@;
+      eval {
+        require YAML::Tiny;
+        my $ref  = YAML::Tiny->read_string( $self->_template_render( $self->{config_path} ) );
+        $config = $ref->[0];
+      };
+      warn Dumper $config if $self->debug;
+      if ($@ or ! defined $config) {
+        croak "$self->{config_path} cannot be read($@)";
+      }
+    }
   }
 
   my %object_hash;

@@ -40,7 +40,6 @@ sub run {
     $code .= generating_code( $self->{config_path} );
   }
 
-warn $code;
   return $code;
 
 }
