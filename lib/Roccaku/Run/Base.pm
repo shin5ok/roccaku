@@ -15,6 +15,31 @@ use lib qq($FindBin::Bin/../lib);
 use Roccaku::Utils ();
 
 our $__GEN_SORT = 20;
+our $__RESULT = +{
+                   fail   => 0,
+                   ok     => 0,
+                   number => 0,
+                };
+
+sub __result {
+  my ($self, $name, $num) = @_;
+  $num ||= 1;
+  $__RESULT->{$name} += $num;
+}
+
+sub add_number {
+  shift->__result( q{number}, shift );
+}
+
+sub add_ok {
+  shift->__result( q{ok}, shift );
+}
+
+sub add_fail {
+  shift->__result( q{fail}, shift );
+}
+
+sub result { $__RESULT; }
 
 sub new {
   my ($class, $params, $option) = @_;

@@ -200,11 +200,12 @@ sub run {
     if (exists $ref->{must}) {
       my $must = $ref->{must};
       $must->run;
+      $must->add_number;
       my $is_must = 1;
       if ((my @fails = $must->fail) > 0) {
         $is_must = 0;
         push @{$result->{fail}->{must}}, @fails;
-        $fail_count++;
+        $fail_count += @fails;
       }
 
       if (not $is_must and exists $ref->{do} and not $self->test_only) {
@@ -212,7 +213,7 @@ sub run {
         $do->run;
         if (my @fails = $do->fail > 0) {
           push @{$result->{fail}->{do}}, @fails;
-          $fail_count++;
+          $fail_count += @fails;
         }
       }
     }

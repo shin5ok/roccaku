@@ -6,6 +6,9 @@ use warnings FATAL => 'all';
 
 use POSIX qw(strftime);
 use FindBin;
+use File::Basename;
+use File::Spec;
+use Carp;
 use lib (qq($FindBin::Bin/../lib), qq($FindBin::Bin/../extlib));
 use JSON::PP;
 
@@ -40,6 +43,20 @@ sub text_template {
   my $tt = Template->new( { RELATIVE => 1, ABSOLUTE => 1, } );
   $tt->process( $template_path, $self->result );
 
+}
+
+sub store {
+  my ($self, $path) = @_;
+
+  $path ||= sprintf "%s/.result.json", $ENV{HOME};
+  warn $path;
+  open my $fh, ">", $path
+    or croak "cannot open $path";
+  flock $fh, 2;
+  print {$fh} encode_json( $self->result );
+  print {$fh} "\n";
+  close $fh;
+  return $self;
 }
 
 1; # End of Roccaku::Result;
