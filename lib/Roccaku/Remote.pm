@@ -28,7 +28,7 @@ sub run {
   my $temporary_working_dir = _gen_working_dir();
 
   my $config_path  = "$temporary_working_dir/config.yaml";
-  my $command_args = _build_args( $params, { "config-path" => $config_path, } );
+  my $command_args = _build_args( $params, { "config-path" => $config_path, "is-remote" => 1, } );
   logging $command_args, undef;
 
   my $path = exists $ENV{ROCCAKU_ROOT_PATH}
