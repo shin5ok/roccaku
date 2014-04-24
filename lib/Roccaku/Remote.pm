@@ -29,12 +29,13 @@ sub run {
 
   my $config_path  = "$temporary_working_dir/config.yaml";
   my $command_args = _build_args( $params, { "config-path" => $config_path, } );
-  warn $command_args, "\n";
+  logging $command_args, undef;
 
   my $path = exists $ENV{ROCCAKU_ROOT_PATH}
            ? $ENV{ROCCAKU_ROOT_PATH}
            : qq{$ENV{HOME}/roccaku};
 
+  local $| = 1;
   my $scp1 = "scp -r -q $path/ $host:$temporary_working_dir/";
   my $scp2 = "scp -r -q $params->{'config-path'} ${host}:$config_path";
   my $run  = sprintf "ssh %s $sudo %s/bin/roccaku %s",
@@ -48,13 +49,12 @@ sub run {
 
   system $scp1;
   system $scp2;
-  warn $run;
   system $run;
   # my $output = qx{$json};
   # stop tmp system $rmd;
 
   return +{
-    result_count => 10,
+    result_count => 44,
   };
   # return decode_json $output;
 

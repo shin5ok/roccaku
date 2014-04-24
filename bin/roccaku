@@ -20,7 +20,6 @@ GetOptions(
   "test-only"    ,
   "argv=s"       ,
   "host=s"       ,
-  "api"          ,
 );
 
 my $r6 = Roccaku->new(
@@ -28,16 +27,17 @@ my $r6 = Roccaku->new(
                        +{
                           debug    => $params{debug},
                           argv     => $params{argv},
-                          api_mode => $params{api},
                         },
                      );
 
 logging("$0 " . join " ", @command_args);
 $r6->test_only( $params{"test-only"} );
 
+my $remote_mode = defined $params{host} ? 1 : 0;
+
 __FOR_CLI_OUTPUT__: {
-  if (! $params{api}) {
-    local $| = 1;
+  local $| = 1;
+  if ($remote_mode) {
     printf "  %s is starting to run...", ref $r6;
     sleep 1;
     printf "test phase only" if $r6->test_only;
@@ -49,8 +49,8 @@ __FOR_CLI_OUTPUT__: {
 my $result = $r6->run( \%params );
 
 __FOR_CLI_RESULT__: {
-  if (! $params{api}) {
-    local $| = 1;
+  local $| = 1;
+  if ($remote_mode) {
     no strict 'refs';
     print "\n";
     if ($result->{success}->{must} and $result->{success}->{do}) {
@@ -75,8 +75,6 @@ __FOR_CLI_RESULT__: {
       print "  Configuring process did have some errors.\n";
       exit 1;
     }
-  } else {
-    print $result->json, "\n";
   }
 }
 

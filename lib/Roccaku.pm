@@ -170,15 +170,17 @@ sub run {
       my $remote_params;
         %$remote_params = %$params;
         my $host = delete $remote_params->{host};
-        warn Dumper $remote_params;
+        warn Dumper { remote_params => $remote_params } if $self->debug;
 
       $r = Roccaku::Remote::run( $host, $remote_params );
-      warn Dumper $r;
     };
     warn $@ if $@;
 
-    warn $r->{result_count};
     $flag = q{local};
+    {
+      require Roccaku::Run::Say;
+      $Roccaku::Run::Say::SAY_NUMBER = $r->{result_count};
+    }
   }
 
   my $test_only = $self->test_only;
