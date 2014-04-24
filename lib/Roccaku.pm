@@ -137,7 +137,7 @@ sub parse {
           if ($@) {
             croak "$full_module_name was load failure($@)";
           }
-          $hash_ref->{$name} = $full_module_name->new( $value, { api_mode => $self->api_mode } );
+          $hash_ref->{$name} = $full_module_name->new( $value );
         }
       }
       push @objects, $hash_ref;
@@ -179,7 +179,7 @@ sub run {
     $flag = q{local};
     {
       require Roccaku::Run::Say;
-      $Roccaku::Run::Say::SAY_NUMBER = $r->{result_count};
+      $Roccaku::Run::Say::SAY_NUMBER = @{$r->{results}};
     }
   }
 

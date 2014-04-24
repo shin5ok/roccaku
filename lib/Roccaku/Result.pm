@@ -48,8 +48,7 @@ sub text_template {
 sub store {
   my ($self, $path) = @_;
 
-  $path ||= sprintf "%s/.result.json", $ENV{HOME};
-  warn $path;
+  $path ||= sprintf "%s/%s", $ENV{HOME}, config->{result_name};
   open my $fh, ">", $path
     or croak "cannot open $path";
   flock $fh, 2;

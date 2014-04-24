@@ -21,6 +21,7 @@ GetOptions(
   "argv=s"       ,
   "host=s"       ,
   "is-remote"    , # use internal only
+  "store-path=s" , # use internal only
 );
 
 my $r6 = Roccaku->new(
@@ -46,6 +47,7 @@ __FOR_CLI_OUTPUT__: {
 }
 
 my $result = $r6->run( \%params );
+$result->store($params{"store-path"}) if $params{"store-path"};
 
 __FOR_CLI_RESULT__: {
   local $| = 1;
