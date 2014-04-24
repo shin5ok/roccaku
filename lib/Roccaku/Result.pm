@@ -37,7 +37,7 @@ sub text_template {
   my ($self, $template_path) = @_;
   $template_path ||= qq{$FindBin::Bin/../template/default.tt};
   require Template;
-  my $tt = Template->new( { RELATIVE => 1 } );
+  my $tt = Template->new( { RELATIVE => 1, ABSOLUTE => 1, } );
   $tt->process( $template_path, $self->result );
 
 }
