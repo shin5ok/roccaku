@@ -182,7 +182,7 @@ sub run {
 
   my $flag = exists $params->{flag}
            ? $params->{flag}
-           : qq{local};
+           : q{main};
 
   for my $ref ( @{$run_objects->{$flag}} ) {
     my $result = +{ comment => q{}, fail => { must => [], do => [] } };
