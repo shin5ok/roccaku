@@ -21,7 +21,6 @@ GetOptions(
   "argv=s"       ,
   "host=s"       ,
   "api"          ,
-  "flag=s"       ,
 );
 
 my $r6 = Roccaku->new(

@@ -158,6 +158,8 @@ sub run {
   my @results;
   my $fail_count = 0;
 
+  my $flag = q{main};
+
   my $run_objects = $self->{run_objects};
   if (defined $params->{host}) {
     # If defined host, run() method exec on remote host
@@ -175,14 +177,11 @@ sub run {
     };
     warn $@ if $@;
 
-    push @results, @{$r->{results}}
+    warn $r->{result_count};
+    $flag = q{local};
   }
 
   my $test_only = $self->test_only;
-
-  my $flag = exists $params->{flag}
-           ? $params->{flag}
-           : q{main};
 
   for my $ref ( @{$run_objects->{$flag}} ) {
     my $result = +{ comment => q{}, fail => { must => [], do => [] } };

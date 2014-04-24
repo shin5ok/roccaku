@@ -28,7 +28,7 @@ sub run {
   my $temporary_working_dir = _gen_working_dir();
 
   my $config_path  = "$temporary_working_dir/config.yaml";
-  my $command_args = _build_args( $params, { "config-path" => $config_path, "api" => 1, flag => q{remote} } );
+  my $command_args = _build_args( $params, { "config-path" => $config_path, } );
   warn $command_args, "\n";
 
   my $path = exists $ENV{ROCCAKU_ROOT_PATH}
@@ -38,20 +38,25 @@ sub run {
   my $scp1 = "scp -r -q $path/ $host:$temporary_working_dir/";
   my $scp2 = "scp -r -q $params->{'config-path'} ${host}:$config_path";
   my $run  = sprintf "ssh %s $sudo %s/bin/roccaku %s",
-                      $host,
-                      $temporary_working_dir,
-                      $command_args;
+                     $host,
+                     $temporary_working_dir,
+                     $command_args;
+  my $json = sprintf "ssh %s $sudo %s/bin/roccaku-result",
+                     $host,
+                     $temporary_working_dir;
   my $rmd  = "ssh $host rm -Rf $temporary_working_dir";
 
-  warn $scp1;
   system $scp1;
-  warn $scp2;
   system $scp2;
   warn $run;
-  my $output = qx{$run};
-  system $rmd;
+  system $run;
+  # my $output = qx{$json};
+  # stop tmp system $rmd;
 
-  return decode_json $output;
+  return +{
+    result_count => 10,
+  };
+  # return decode_json $output;
 
 }
 
