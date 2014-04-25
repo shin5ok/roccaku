@@ -197,25 +197,41 @@ sub run {
     }
     $result->{comment} = $comment;
 
-    if (exists $ref->{must} or $ref->{must_not}) {
-      my $must = $ref->{must} || $ref->{must_not};
-      $must->run;
-      $must->add_number;
-      my $is_must = 1;
-      if ((my @fails = $must->fail) > 0) {
-        $is_must = 0;
-        push @{$result->{fail}->{must}}, @fails;
-        $fail_count += @fails;
-      }
+    my $is_skip;
+    if (exists $ref->{skip}) {
+      my $skip = $ref->{skip};
+      $skip->run;
 
-      if (not $is_must and exists $ref->{do} and not $self->test_only) {
-        my $do = $ref->{do};
-        $do->run;
-        if (my @fails = $do->fail > 0) {
-          push @{$result->{fail}->{do}}, @fails;
+      if ($skip->fail > 0) {
+        $is_skip = 1;
+      }
+    }
+
+    if (! $is_skip) {
+
+      if (exists $ref->{must} or $ref->{must_not}) {
+        my $must = $ref->{must} || $ref->{must_not};
+        $must->run;
+        $must->add_number;
+        my $is_must = 1;
+        if ((my @fails = $must->fail) > 0) {
+          $is_must = 0;
+          push @{$result->{fail}->{must}}, @fails;
           $fail_count += @fails;
         }
+
+        if (not $is_must and exists $ref->{do} and not $self->test_only) {
+          my $do = $ref->{do};
+          $do->run;
+          if (my @fails = $do->fail > 0) {
+            push @{$result->{fail}->{do}}, @fails;
+            $fail_count += @fails;
+          }
+        }
       }
+    } else {
+      warn "\tskipping...", "\n";
+
     }
     push @results, $result;
   }
