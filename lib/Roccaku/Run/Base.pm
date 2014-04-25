@@ -112,12 +112,14 @@ sub command {
     $stdout ||= qq{none};
     $stderr ||= qq{none};
 
-    if ($exit_code != 0 and not $__NOT_MODE) {
-      $self->fail( "command: $command (stderr: $stderr)" );
-      return undef;
+    if (($exit_code != 0 and not $__NOT_MODE)
+         or ($exit_code == 0 and $__NOT_MODE)) {
+        $self->fail( "command: $command (stderr: $stderr)" );
+        return undef;
     }
 
     return 1;
+
   }
 }
 
