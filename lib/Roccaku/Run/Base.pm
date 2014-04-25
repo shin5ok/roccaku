@@ -21,6 +21,7 @@ our $__RESULT = +{
                    number => 0,
                 };
 
+our $__NOT_LOG;
 our $__NOT_MODE;
 
 sub __result {
@@ -154,8 +155,7 @@ sub logging {
   my $self     = shift;
   my $string   = shift;
   no strict 'refs';
-  my $api_mode = $self->{option}->{api_mode} ? 1 : 0;
-  Roccaku::Utils::logging( $string, not $api_mode );
+  Roccaku::Utils::logging( $string, 1 ) if not $__NOT_LOG;
 }
 
 our $AUTOLOAD;

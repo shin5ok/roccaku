@@ -11,4 +11,6 @@ use base qw( Roccaku::Run::Must );
 
 our $__GEN_SORT = 52;
 
+local $Roccaku::Run::Base::__NOT_LOG = 1;
+
 1; # End of Roccaku::Run::Skip;
