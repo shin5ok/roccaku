@@ -197,8 +197,8 @@ sub run {
     }
     $result->{comment} = $comment;
 
-    if (exists $ref->{must}) {
-      my $must = $ref->{must};
+    if (exists $ref->{must} or $ref->{must_not}) {
+      my $must = $ref->{must} || $ref->{must_not};
       $must->run;
       $must->add_number;
       my $is_must = 1;

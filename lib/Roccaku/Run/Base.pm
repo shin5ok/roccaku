@@ -21,6 +21,8 @@ our $__RESULT = +{
                    number => 0,
                 };
 
+our $__NOT_MODE;
+
 sub __result {
   my ($self, $name, $num) = @_;
   $num ||= 1;
@@ -103,13 +105,14 @@ sub command {
     waitpid $pid, 0;
     my $exit_code = $? >> 8;
 
-    if ($exit_code != 0) {
-      my $stderr = do { local $/; defined $e and <$e> };
-      my $stdout = do { local $/; defined $r and <$r> };
+    my $stderr = do { local $/; defined $e and <$e> };
+    my $stdout = do { local $/; defined $r and <$r> };
 
-      $stdout ||= qq{none};
-      $stderr ||= qq{none};
-      # $self->logging( $stdout );
+    $self->logging( $stdout ) if $stdout and $self->debug;
+    $stdout ||= qq{none};
+    $stderr ||= qq{none};
+
+    if ($exit_code != 0 and not $__NOT_MODE) {
       $self->fail( "command: $command (stderr: $stderr)" );
       return undef;
     }
