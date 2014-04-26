@@ -16,6 +16,7 @@ sub import {
   my $caller = caller;
   no strict 'refs';
   no warnings 'redefine';
+  *{"${caller}::config"}      = \&config;
   *{"${caller}::logging"}     = \&logging;
   *{"${caller}::server_info"} = \&server_info;
 }
@@ -34,6 +35,7 @@ sub logging {
 }
 
 
+
 sub server_info {
   +{
      hostname => hostname,
@@ -50,6 +52,14 @@ sub get_ip {
   }
   close $pipe;
   return \@ips;
+}
+
+sub config {
+  +{
+     result_name => q{.roccaku-result.json},
+
+  },
+
 }
 
 1; # End of Roccaku::Utils;

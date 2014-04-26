@@ -36,6 +36,7 @@ sub file {
 
   if (exists $argv->{create}) {
     my $cm = $argv->{create};
+    # Warning... file will be initialized
     if (! open my $fh, ">", $argv->{path}) {
       $self->fail("$argv->{path} cannot create");
       return 0;
@@ -149,4 +150,4 @@ sub file {
 
 }
 
-1; # End of Roccaku::Do;
+1; # End of Roccaku::Run::Do;

@@ -12,13 +12,13 @@ use base qw( Roccaku::Run::Must );
 our $__GEN_SORT = 51;
 
 sub favor {
-  my ($self, @args) = @_;
-  ! $self->SUPER::favor( @args );
+  local $Roccaku::Run::Base::__NOT_MODE = 1;
+  return shift->SUPER::favor( @_ );
 }
 
 sub file {
-  my ($self, $argv) = @_;
-  ! $self->SUPER::file( $argv );
+  local $Roccaku::Run::Base::__NOT_MODE = 1;
+  return shift->SUPER::file( @_ );
 }
 
-1; # End of Roccaku::Must_not;
+1; # End of Roccaku::Run::Must_not;

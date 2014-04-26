@@ -137,7 +137,7 @@ sub parse {
           if ($@) {
             croak "$full_module_name was load failure($@)";
           }
-          $hash_ref->{$name} = $full_module_name->new( $value, { api_mode => $self->api_mode } );
+          $hash_ref->{$name} = $full_module_name->new( $value );
         }
       }
       push @objects, $hash_ref;
@@ -158,6 +158,8 @@ sub run {
   my @results;
   my $fail_count = 0;
 
+  my $flag = q{main};
+
   my $run_objects = $self->{run_objects};
   if (defined $params->{host}) {
     # If defined host, run() method exec on remote host
@@ -168,21 +170,20 @@ sub run {
       my $remote_params;
         %$remote_params = %$params;
         my $host = delete $remote_params->{host};
-        warn Dumper $remote_params;
+        warn Dumper { remote_params => $remote_params } if $self->debug;
 
       $r = Roccaku::Remote::run( $host, $remote_params );
-      warn Dumper $r;
     };
     warn $@ if $@;
 
-    push @results, @{$r->{results}}
+    $flag = q{local};
+    {
+      require Roccaku::Run::Say;
+      $Roccaku::Run::Say::SAY_NUMBER = @{$r->{results}};
+    }
   }
 
   my $test_only = $self->test_only;
-
-  my $flag = exists $params->{flag}
-           ? $params->{flag}
-           : q{main};
 
   for my $ref ( @{$run_objects->{$flag}} ) {
     my $result = +{ comment => q{}, fail => { must => [], do => [] } };
@@ -196,24 +197,41 @@ sub run {
     }
     $result->{comment} = $comment;
 
-    if (exists $ref->{must}) {
-      my $must = $ref->{must};
-      $must->run;
-      my $is_must = 1;
-      if ((my @fails = $must->fail) > 0) {
-        $is_must = 0;
-        push @{$result->{fail}->{must}}, @fails;
-        $fail_count++;
-      }
+    my $is_skip;
+    if (exists $ref->{skip}) {
+      my $skip = $ref->{skip};
+      $skip->run;
 
-      if (not $is_must and exists $ref->{do} and not $self->test_only) {
-        my $do = $ref->{do};
-        $do->run;
-        if (my @fails = $do->fail > 0) {
-          push @{$result->{fail}->{do}}, @fails;
-          $fail_count++;
+      if ($skip->fail > 0) {
+        $is_skip = 1;
+      }
+    }
+
+    if (! $is_skip) {
+
+      if (exists $ref->{must} or $ref->{must_not}) {
+        my $must = $ref->{must} || $ref->{must_not};
+        $must->run;
+        $must->add_number;
+        my $is_must = 1;
+        if ((my @fails = $must->fail) > 0) {
+          $is_must = 0;
+          push @{$result->{fail}->{must}}, @fails;
+          $fail_count += @fails;
+        }
+
+        if (not $is_must and exists $ref->{do} and not $self->test_only) {
+          my $do = $ref->{do};
+          $do->run;
+          if (my @fails = $do->fail > 0) {
+            push @{$result->{fail}->{do}}, @fails;
+            $fail_count += @fails;
+          }
         }
       }
+    } else {
+      warn "\tskipping...", "\n";
+
     }
     push @results, $result;
   }

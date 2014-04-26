@@ -347,13 +347,16 @@ run:
             - "^nameserver\s+192\.168\.232\.12$"
             - "^nameserver\s+192\.168\.232\.13$"
       do:
-        - command: rm /etc/resolv.conf
-        - file: 
+        - file:
+            create:
+              mode: 0664
+              owner: root
+              group: sys
             path: /etc/resolv.conf
             rewrite:
               - add: "nameserver 192.168.232.12\n"
               - add: "nameserver 192.168.232.13\n"
-        
+
   local:
     - say: local check dummy
       must:

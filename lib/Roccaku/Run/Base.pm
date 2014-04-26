@@ -15,6 +15,34 @@ use lib qq($FindBin::Bin/../lib);
 use Roccaku::Utils ();
 
 our $__GEN_SORT = 20;
+our $__RESULT = +{
+                   fail   => 0,
+                   ok     => 0,
+                   number => 0,
+                };
+
+our $__NOT_LOG;
+our $__NOT_MODE;
+
+sub __result {
+  my ($self, $name, $num) = @_;
+  $num ||= 1;
+  $__RESULT->{$name} += $num;
+}
+
+sub add_number {
+  shift->__result( q{number}, shift );
+}
+
+sub add_ok {
+  shift->__result( q{ok}, shift );
+}
+
+sub add_fail {
+  shift->__result( q{fail}, shift );
+}
+
+sub result { $__RESULT; }
 
 sub new {
   my ($class, $params, $option) = @_;
@@ -78,18 +106,21 @@ sub command {
     waitpid $pid, 0;
     my $exit_code = $? >> 8;
 
-    if ($exit_code != 0) {
-      my $stderr = do { local $/; defined $e and <$e> };
-      my $stdout = do { local $/; defined $r and <$r> };
+    my $stderr = do { local $/; defined $e and <$e> };
+    my $stdout = do { local $/; defined $r and <$r> };
 
-      $stdout ||= qq{none};
-      $stderr ||= qq{none};
-      # $self->logging( $stdout );
-      $self->fail( "command: $command (stderr: $stderr)" );
-      return undef;
+    $self->logging( $stdout ) if $stdout and $self->debug;
+    $stdout ||= qq{none};
+    $stderr ||= qq{none};
+
+    if (($exit_code != 0 and not $__NOT_MODE)
+         or ($exit_code == 0 and $__NOT_MODE)) {
+        $self->fail( "command: $command (stderr: $stderr)" );
+        return undef;
     }
 
     return 1;
+
   }
 }
 
@@ -124,8 +155,7 @@ sub logging {
   my $self     = shift;
   my $string   = shift;
   no strict 'refs';
-  my $api_mode = $self->{option}->{api_mode} ? 1 : 0;
-  Roccaku::Utils::logging( $string, not $api_mode );
+  Roccaku::Utils::logging( $string, 1 ) if not $__NOT_LOG;
 }
 
 our $AUTOLOAD;
