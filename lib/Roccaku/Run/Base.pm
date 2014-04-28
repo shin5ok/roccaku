@@ -148,7 +148,7 @@ sub fail {
   }
 
   return @{$self->{fail}} if wantarray;
-  return   $self->{fail};
+  return @{$self->{fail}} + 0;
 }
 
 sub logging {
