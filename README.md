@@ -11,9 +11,9 @@ Chef、ansible、serverspec が難しいひと向け
   標準モジュールのみ
 
 ###利用例
-- #####テストモード
+- テストモード
 $ sudo roccaku -c ./basic-server.yml --host webserver001 --test-only   
-- #####テスト & 設定モード
+- テスト & 設定モード
 $ sudo roccaku -c ./basic-server.yml --host webserver001
 basic-server.yml(設定サンプル)
 
