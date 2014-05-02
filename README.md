@@ -1,7 +1,7 @@
 #Roccaku
 
 ###サーバテスト、設定ツール
-超シンプル、プログラミングの知識なしで利用できます  
+超シンプル、新たに覚えることが少なく、プログラミングの知識なしで利用できます  
 Chef、ansible、serverspec が難しいひと向け  
 設定ファイルひとつで、テストとサーバ設定を一緒にできます  
 
@@ -18,7 +18,9 @@ Chef、ansible、serverspec が難しいひと向け
 - テストモード  
 $ sudo roccaku -c ./basic-server.yml --host webserver001 --test-only   
 - テスト & 設定モード  
-$ sudo roccaku -c ./basic-server.yml --host webserver001
+$ sudo roccaku -c ./basic-server.yml --host webserver001  
+- テスト & 設定モード(ローカルのみで実行)  
+$ sudo roccaku -c ./basic-server.yml  
 
 ####basic-server.yml(設定例)
 
