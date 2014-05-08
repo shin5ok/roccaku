@@ -6,7 +6,7 @@ Chef、ansible、serverspec が難しいひと向け
 設定ファイルひとつで、テストとサーバ設定を一緒にできます  
 
 ###必要な知識、スキル
-- シェルコマンド（戻り値）
+- シェルコマンド
 - YAML（基礎）
 のみ  
 
@@ -173,15 +173,15 @@ run:
 
     - say: user check
       must:
-        - grep ^kawano       /etc/passwd
+        - grep ^foo       /etc/passwd
 
     - say: home directory check
       skip:
-        - command: grep ^kawano: /etc/passwd
+        - command: grep ^foo: /etc/passwd
       must:
-        - test -d /home/kawano
+        - test -d /home/foo
       do:
-        - cp -a /etc/skel /home/kawano      ; chown -R kawano.admin_group /home/kawano
+        - cp -a /etc/skel /home/foo      ; chown -R foo.admin_group /home/foo
 
     - say: group check
       must:
