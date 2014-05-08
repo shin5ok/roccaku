@@ -70,9 +70,9 @@ sub run {
       if ($? != 0) {
         $do_try = 0;
         if (defined $install_perl) {
-          my $pre = sprintf "ssh %s %s %s", $host, $env, $install_perl;
-          warn "\ttry installing perl";
-          system $pre " > /dev/null";
+          my $pre = sprintf "ssh %s %s '%s'", $host, $env, $install_perl;
+          warn "\tTry installing perl", "\n";
+          system $pre . " > /dev/null";
         }
         croak "perl interpreter is not found.\nRoccaku require a perl, You have to install perl.";
       } else {
