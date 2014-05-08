@@ -21,6 +21,8 @@ our $temporary_working_base = q{/var/tmp};
 sub run {
   my ($host, $params, $env) = @_;
 
+  $env ||= qq{};
+
   can_do_remote( $host );
 
   # It's mine...not remote!
@@ -46,7 +48,7 @@ sub run {
   local $| = 1;
   my $scp1 = "scp -r -q $path/ $host:$temporary_working_dir/";
   my $scp2 = "scp -r -q $params->{'config-path'} ${host}:$config_path";
-  my $run  = sprintf "ssh %s $sudo %s/bin/roccaku %s",
+  my $run  = sprintf "ssh %s $env %s/bin/roccaku %s",
                      $host,
                      $temporary_working_dir,
                      $command_args;
@@ -66,7 +68,8 @@ sub run {
       if ($? != 0) {
         $do_try = 0;
         if (exists $params->{'install-perl'}) {
-          my $pre = sprintf "ssh %s %s %s", $host, $sudo, $params->{'install-perl'};
+          my $pre = sprintf "ssh %s %s %s", $host, $env, $params->{'install-perl'};
+          warn $pre;
           system $pre;
         }
         croak "perl is not found.\nRoccaku require a perl, You have to install perl.";

@@ -121,6 +121,12 @@ sub parse {
     }
   }
 
+  {
+    require Roccaku::Env;
+    no strict 'refs';
+    $self->{env} = Roccaku::Env->new( $config->{env} );
+  }
+
   my %object_hash;
   while (my ($key, $x) = each %{$config->{run}}) {
     my @objects;

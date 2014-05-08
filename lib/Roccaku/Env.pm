@@ -1,4 +1,4 @@
-package Roccaku::Run::Env;
+package Roccaku::Env;
 
 use 5.006;
 use strict;
