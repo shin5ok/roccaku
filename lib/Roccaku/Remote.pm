@@ -19,7 +19,9 @@ our $sudo = qq{};
 our $temporary_working_base = q{/var/tmp};
 
 sub run {
-  my ($host, $params) = @_;
+  my ($host, $params, $env) = @_;
+
+  can_do_remote( $host );
 
   # It's mine...not remote!
   # is_this_me($host) and return +{};
@@ -40,7 +42,7 @@ sub run {
            ? $ENV{ROCCAKU_ROOT_PATH}
            : qq{$ENV{HOME}/roccaku};
 
-  # !!!!! for now, temporary code !!!!!
+  # !!!!! for now, temporary code !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   local $| = 1;
   my $scp1 = "scp -r -q $path/ $host:$temporary_working_dir/";
   my $scp2 = "scp -r -q $params->{'config-path'} ${host}:$config_path";
@@ -54,11 +56,32 @@ sub run {
                      config->{result_name};
   my $rmd  = "ssh $host rm -Rf $temporary_working_dir";
 
+  # 近いうちに、can_do_remote() に入れる
+  {
+    my $do_try = 1;
+    do {
+      # require a perl
+      local $?;
+      my $version = qx{ssh $host perl -v};
+      if ($? != 0) {
+        $do_try = 0;
+        if (exists $params->{'install-perl'}) {
+          my $pre = sprintf "ssh %s %s %s", $host, $sudo, $params->{'install-perl'};
+          system $pre;
+        }
+        croak "perl is not found.\nRoccaku require a perl, You have to install perl.";
+      } else {
+        last;
+      }
+    } while ($do_try);
+  }
+
   system $scp1;
   system $scp2;
   system $run;
   my $output = qx{$json};
   system $rmd;
+  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   return decode_json $output;
 
@@ -105,6 +128,11 @@ sub _build_args {
 
   return $command_args;
 
+}
+
+sub can_do_remote {
+  require Roccaku::Remote::SSH;
+  goto \&Roccaku::Remote::SSH::run;
 }
 
 1; # End of Roccaku::Say;

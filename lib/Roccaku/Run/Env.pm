@@ -10,9 +10,14 @@ use Roccaku::Run::Base;
 use base qw( Roccaku::Run::Base );
 
 our $__GEN_SORT = 50;
+our $env = qq{};
 
 sub run {
   my ($self) = @_;
+}
+
+sub env {
+
 }
 
 1; # End of Roccaku::Run::Env;

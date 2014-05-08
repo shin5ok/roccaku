@@ -14,14 +14,15 @@ our @command_args = @ARGV;
 my %params;
 GetOptions(
   \%params,
-  "config-path=s",
-  "not-backup=s" ,
-  "debug"        ,
-  "test-only"    ,
-  "argv=s"       ,
-  "host=s"       ,
-  "is-remote"    , # use internal only
-  "store-path=s" , # use internal only
+  "config-path=s" ,
+  "not-backup=s"  ,
+  "debug"         ,
+  "test-only"     ,
+  "argv=s"        ,
+  "host=s"        ,
+  "install-perl=s", # for remote
+  "is-remote"     , # use internal only
+  "store-path=s"  , # use internal only
 );
 
 my $r6 = Roccaku->new(
