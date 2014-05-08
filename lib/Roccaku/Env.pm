@@ -7,17 +7,30 @@ use warnings FATAL => 'all';
 use FindBin;
 use lib  qq($FindBin::Bin/../lib);
 use Roccaku::Run::Base;
-use base qw( Roccaku::Run::Base );
 
-our $__GEN_SORT = 50;
 our $env = qq{};
 
-sub run {
+sub new {
+  my ($class, $hash_ref) = @_;
+  $hash_ref ||= {};
+  bless {
+    env => $hash_ref,
+  }, $class;
+}
+
+sub env_string {
   my ($self) = @_;
+  return _create_env_string( $hash_ref );
 }
 
-sub env {
-
+sub _create_env_string {
+  my ($hash_ref) = @_;
+  my $env = qq{};
+  while (my ($key, $value) = each %$hash_ref) {
+    $env and $env .= qq{ };
+    $env .= qq{${key}=$value};
+  }
+  return $env;
 }
 
-1; # End of Roccaku::Run::Env;
+1; # End of Roccaku::Env;
