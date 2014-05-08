@@ -66,14 +66,15 @@ sub run {
     do {
       # require a perl
       local $?;
-      my $version = qx{$env ssh $host perl -v};
+      my $version = qx{ssh $host perl -v};
       if ($? != 0) {
         $do_try = 0;
         if (defined $install_perl) {
-          my $pre = sprintf "%s ssh %s %s", $env, $host, $install_perl;
-          system $pre;
+          my $pre = sprintf "ssh %s %s %s", $host, $env, $install_perl;
+          warn "\ttry installing perl";
+          system $pre " > /dev/null";
         }
-        croak "perl is not found.\nRoccaku require a perl, You have to install perl.";
+        croak "perl interpreter is not found.\nRoccaku require a perl, You have to install perl.";
       } else {
         last;
       }

@@ -1,8 +1,8 @@
 ---
 env:
-LANG: C
-PATH: /sbin:/usr/sbin:/bin:/usr/bin
-http_proxy: http://192.168.232.11:3128
+  LANG: C
+  PATH: /sbin:/usr/sbin:/bin:/usr/bin
+  http_proxy: http://192.168.232.11:3128
 
 run:
   main:
@@ -32,10 +32,6 @@ run:
         - service postfix start
       say: postfix running
 
-    - must: rpm -qa | grep perl-Sys-Guestfs
-      do: yum -y install perl-Sys-Guestfs
-      say: perl-Sys-Guestfs installed
-
     - must: rpm -qa | grep epel
       do: rpm -ivh http://192.168.232.11/epel.rpm
       say: epel installed
@@ -57,7 +53,7 @@ run:
               after: '^setgid_group'
               before: '^readme_directory'
       say: postfix main.cf is configured for relayhost
-    
+
     - must:
         file:
           path: /etc/postfix/main.cf
@@ -70,47 +66,6 @@ run:
             - add: "transport_maps = hash:/etc/postfix/transport\n"
               before: '^html_directory'
       say: postfix main.cf is configured for transport
-    
-    - must: test -d /home/smc/murakumo_node
-      say: murakumo directory check
-
-
-    - must:
-        - test -x /etc/init.d/murakumo_node_api   
-        - test -x /etc/init.d/murakumo_node_job   
-        - test -x /etc/init.d/murakumo_node_submit
-    
-      say: murakumo_node boot init
-      do:
-        - ln -s /home/smc/murakumo_node/bin/Murakumo_Node_api.init    /etc/init.d/murakumo_node_api  
-        - ln -s /home/smc/murakumo_node/bin/Murakumo_Node_job.init    /etc/init.d/murakumo_node_job 
-        - ln -s /home/smc/murakumo_node/bin/Murakumo_Node_submit.init /etc/init.d/murakumo_node_submit
-  
-    - must:
-        - command: ps ax | grep Murakumo_Node_server | grep -v grep
-      say: murakumo_node_api running
-      do:
-        - command: chkconfig murakumo_node_api on
-        - command: /etc/init.d/murakumo_node_api start
-
-    - must:
-        - command: ps ax | grep murakumo_node_job | grep -v grep
-      say: murakumo_node_job running
-      do:
-        - command: chkconfig murakumo_node_job on
-        - command: /etc/init.d/murakumo_node_job start
-
-    - must: test -x /usr/bin/murakumo-perl
-      do: 
-        - rm /usr/bin/murakumo-perl
-        - ln -s /home/smc/local/perl-5.14.2/bin/perl /usr/bin/murakumo-perl
-      say: murakumo-perl setupped
-
-    - must: ps ax | grep murakumo_node_submit | grep -v grep
-      say: murakumo_node_submit running
-      do:
-        - command: chkconfig murakumo_node_submit on
-        - command: /etc/init.d/murakumo_node_submit start
 
     - must: rpm -qa | grep munin-node | grep -v grep
       do: yum -y install munin-node
@@ -125,6 +80,10 @@ run:
       do:
         file:
           path: /etc/cron.d/ntpdate
+          create:
+            group: root
+            owner: root
+            mode: 0644
           rewrite:
             add: "*/10 * * * * root /usr/sbin/ntpdate -s 192.168.232.10 && /sbin/clock -w\n"
 
@@ -160,22 +119,6 @@ run:
               pre_pattern: "^SELINUX=enforcing"
               post_string: "SELINUX=disabled\n"
 
-    - say: kernel parameter config
-      must:
-        file:
-          path: /etc/sysctl.conf
-          pattern:
-            - "^vm\.swappiness\s*\=\s*10$"
-      do:
-        file:
-          path: /etc/sysctl.conf
-          rewrite:
-            - add: "vm.swappiness = 10\n"
-        command: sysctl -a
-
-    - say: kernel parameter runtime
-      must: sysctl -p | grep '^vm\.swappiness \= 10'
-
     - say: routing check conf
       must:
         file:
@@ -190,154 +133,31 @@ run:
               post_string: "GATEWAY=192.168.232.1\n"
             add: "GATEWAY=192.168.232.1"
 
-    - say: routing check runtime
-      must: netstat -rn | grep ^0.0.0.0 | grep ' 192\.168\.23[32]\.1 '
-
-    - say: user check
-      must:
-        - grep ^miyamoto     /etc/passwd
-        - grep ^d\-inoue     /etc/passwd
-        - grep ^k\-nishiyama /etc/passwd
-        - grep ^morisaki     /etc/passwd
-        - grep ^kawasaki     /etc/passwd
-        - grep ^kawano       /etc/passwd
-
-    - say: home directory check
-      must:
-        - test -d /home/miyamoto
-        - test -d /home/d-inoue
-        - test -d /home/k-nishiyama
-        - test -d /home/morisaki
-        - test -d /home/kawasaki
-        - test -d /home/kawano
-      do:
-        - cp -a /etc/skel /home/miyamoto    ; chown -R miyamoto.mcnet /home/miyamoto
-        - cp -a /etc/skel /home/d-inoue     ; chown -R d-inoue.mcnet /home/d-inoue
-        - cp -a /etc/skel /home/k-nishiyama ; chown -R k-nishiyama.mcnet /home/k-nishiyama
-        - cp -a /etc/skel /home/morisaki    ; chown -R morisaki.mcnet /home/morisaki
-        - cp -a /etc/skel /home/kawasaki    ; chown -R kawasaki.mcnet /home/kawasaki
-        - cp -a /etc/skel /home/kawano      ; chown -R kawano.mcnet /home/kawano
-    
-    - say: group check
-      must:
-        - 'grep ^mcnet: /etc/group'
-
-      do:
-        - command: /usr/sbin/groupadd -g 101 mcnet
-
-    - say: sudoers check
-      must:
-        file:
-          path: /etc/sudoers
-          pattern:
-            - "^%mcnet"
-
-    - say: megasasctl available
-      must: test -x /usr/sbin/megasasctl
-
-    - say: /var/SMC/cron check
-      must:
-        - test -d /var/SMC/cron
-        - ls -dl /var/SMC/cron | grep 'drwxrwxrwt.'
-      do:
-        - command: mkdir -p /var/SMC/cron
-        - command: chmod 1777 /var/SMC/cron
-
-    - say: check_raid nagios file
-      must:
-        - command: test -x /usr/local/nagios/libexec/check_raid
-
-    - say: perl modules
-      must:
-        command: /usr/bin/perl -MIPC::Cmd -e 1
-      do:
-        command: yum -y install perl-IPC-Cmd
-
-    - say: aliases check
-      must:
-        - db_dump -p /etc/aliases.db | grep '^ root'
-        - db_dump -p /etc/aliases.db | grep '^ managed\-system\@nttsmc.com'
-      do:
-        - file:
-            path: /etc/aliases
-            rewrite:
-              remove: "^root:"
-              add: "root: managed-system@nttsmc.com\n"
-        - command: newaliases
-
-    - say: rsyslog.conf check
-      must:
-        file:
-          path: /etc/rsyslog.conf
-          pattern: "^local0\.\*.+/murakumo_node_api\.log"
-      do:
-        - file:
-            path: /etc/rsyslog.conf
-            rewrite:
-              add: "local0.*     /var/log/murakumo_node_api.log\n"
-              before: "^local7\."
-        - command: /etc/init.d/rsyslog restart
-
-    - say: libvirt valid version installed
-      must:
-        - command: libvirtd --version | grep ' 0.10.2'
-      do:
-        - command: yum -y install libvirt
-        - command: chkconfig libvirtd on
-    - say: nrpe run
-      must: ps ax| grep nrpe | grep -v grep
-      do:
-        - chkconfig nrpe on
-        - service nrpe start
-
-    - say: nrpe check
-      must:
-        file:
-          path: /etc/nagios/nrpe.cfg
-          pattern:
-            - "hosting_disk"
-            - "internal_services"
-
     - say: iptables check
       must_not:
-        - /sbin/iptables -nL | grep ^REJECT | grep -v grep
-        - /sbin/iptables -nL | grep ^ACCEPT | grep -v grep
+        - /sbin/iptables -n -L | grep ^REJECT | grep -v grep
+        - /sbin/iptables -n -L | grep ^ACCEPT | grep -v grep
       do:
         - chkconfig --del iptables
+        - rm -f /etc/libvirt/qemu/networks/autostart/default.xml
+        # - service libvirtd restart
         - service iptables stop
 
-    - say: fstab check
-      must:
-        - file:
-            path: /etc/fstab
-            pattern:
-              - "/nfs/share"
+    - say: wget command
+      must: which wget
       do:
-        - file:
-            path: /etc/fstab
-            rewrite:
-              add: "192.168.233.24:/nfs/share  /nfs/share               nfs _netdev,ro,soft 0 0\n"
-        - command: mkdir -p /nfs/share
+        - yum -y install wget
 
-    - say: nfs share mount
-      must:
-        - command: mount | grep /nfs/share | grep -v grep
-      do:
-        - command: mount /nfs/share
-
-    - say: ssh key ready
-      must:
-        - command: md5sum /root/.ssh/id_rsa | grep 910ea9f70c7bbaff965e7908e54f4908 | grep -v grep
-        - command: md5sum /root/.ssh/authorized_keys | grep 251359e3bb885a98f85a6ea924777e86 | grep -v grep
-
-    - say: storage network
-      must: /sbin/ifconfig | grep "addr:10.10." | grep -v grep
-    
     - say: b command
       must: test -x /usr/bin/b
       do:
         - wget http://192.168.232.11/b -P /usr/bin
         - chmod 755 /usr/bin/b
+
+    - say: vim-enhanced
+      must: which vim
+      do:
+        - yum -y install vim-enhanced
 
     - say: resolv conf
       must:
