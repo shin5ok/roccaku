@@ -172,6 +172,7 @@ sub run {
   my $flag = q{main};
 
   my $run_objects = $self->{run_objects};
+  my $remote_r;
   if (defined $params->{host}) {
     # If defined host, run() method exec on remote host
     local $@;
@@ -184,21 +185,21 @@ sub run {
         my $install_perl = delete $remote_params->{'install-perl'};
         warn Dumper { remote_params => $remote_params } if $self->debug;
 
-      $r = Roccaku::Remote::run(
-                                 $host,
-                                 $remote_params,
-                                 {
-                                   env          => $self->{env}->env_string,
-                                   install_perl => $install_perl,
-                                 }
-                                );
+      $remote_r = Roccaku::Remote::run(
+                                        $host,
+                                        $remote_params,
+                                        {
+                                          env          => $self->{env}->env_string,
+                                          install_perl => $install_perl,
+                                        }
+                                       );
     };
     warn $@ if $@;
 
     $flag = q{local};
     {
       require Roccaku::Run::Say;
-      $Roccaku::Run::Say::SAY_NUMBER = @{$r->{results}};
+      $Roccaku::Run::Say::SAY_NUMBER = @{$remote_r->{results}};
     }
   }
 
@@ -255,7 +256,15 @@ sub run {
     push @results, $result;
   }
 
-  my $ok = $fail_count == 0 ? 1 : 0;
+  my $ok = 0;
+  if ( $remote_r ) {
+    if ($remote_r->{ok} and $fail_count == 0) {
+      $ok = 1;
+    }
+  } else {
+    $ok = 1 if $fail_count == 0;
+  }
+
   require Roccaku::Result;
   return Roccaku::Result->new( +{ ok => $ok, results => \@results } );
 

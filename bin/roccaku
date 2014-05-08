@@ -55,29 +55,22 @@ __FOR_CLI_RESULT__: {
   if (! $params{"is-remote"}) {
     no strict 'refs';
     print "\n";
-    if ($result->{success}->{must} and $result->{success}->{do}) {
-      print "  all processes was successfully.\n";
+    if ($result->result->{ok}) {
+      if (! $r6->test_only) {
+        print "  all processes was successfully.\n";
+      } else {
+        print "  all MUST checking was successfully.\n";
+      }
       exit 0;
-    }
-    elsif ($result->{success}->{must}) {
-      print "  all MUST checking was successfully.\n";
-      exit 0;
-    }
-    elsif (! $result->{success}->{must}) {
+    } else {
       print "  MUST checking has some errors.\n";
       if (! $r6->test_only) {
         printf "  But Just now, try to run Configure processes.\n";
         printf "  Run this command again to confirm them.\n";
         printf "  \$ sudo $0 %s -t(--test-only)\n", (join " ", @command_args);
-        exit 0;
       }
-      exit 1;
-    }
-    elsif (! $result->{success}->{do}) {
-      print "  Configuring process did have some errors.\n";
       exit 1;
     }
   }
 }
-
 
