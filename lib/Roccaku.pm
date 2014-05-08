@@ -58,6 +58,7 @@ sub new {
               api_mode    => undef,
               debug       => 0,
               run_objects => [],
+              env         => undef,
               config_path => $config_path,
               argv        => +{},
             }, $class;
@@ -117,7 +118,11 @@ sub parse {
       if ($@ or ! defined $config) {
         croak "$self->{config_path} cannot be read($@)";
       }
-      warn Dumper $config if $self->debug;
+    }
+    if ($self->debug) {
+      warn "####### config from yaml ###################";
+      warn Dumper $config                                ;
+      warn "############################################";
     }
   }
 
@@ -175,10 +180,11 @@ sub run {
     eval {
       my $remote_params;
         %$remote_params = %$params;
-        my $host = delete $remote_params->{host};
+        my $host = delete $remote_params->{'host'};
+                   delete $remote_params->{'install-perl'};
         warn Dumper { remote_params => $remote_params } if $self->debug;
 
-      $r = Roccaku::Remote::run( $host, $remote_params );
+      $r = Roccaku::Remote::run( $host, $remote_params, $self->{env}->env_string );
     };
     warn $@ if $@;
 

@@ -36,7 +36,7 @@ sub run {
   my $command_args = _build_args( $params, {
                                              "config-path" => $config_path,
                                              "is-remote"   => 1,
-                                             "store-path"   => $store_path,
+                                             "store-path"  => $store_path,
                                             } );
   logging $command_args, undef;
 
@@ -48,8 +48,9 @@ sub run {
   local $| = 1;
   my $scp1 = "scp -r -q $path/ $host:$temporary_working_dir/";
   my $scp2 = "scp -r -q $params->{'config-path'} ${host}:$config_path";
-  my $run  = sprintf "ssh %s $env %s/bin/roccaku %s",
+  my $run  = sprintf "ssh %s %s %s/bin/roccaku %s",
                      $host,
+                     $env,
                      $temporary_working_dir,
                      $command_args;
   my $json = sprintf "ssh %s $sudo cat %s/%s",
@@ -64,12 +65,11 @@ sub run {
     do {
       # require a perl
       local $?;
-      my $version = qx{ssh $host perl -v};
+      my $version = qx{ssh $host $env perl -v};
       if ($? != 0) {
         $do_try = 0;
         if (exists $params->{'install-perl'}) {
           my $pre = sprintf "ssh %s %s %s", $host, $env, $params->{'install-perl'};
-          warn $pre;
           system $pre;
         }
         croak "perl is not found.\nRoccaku require a perl, You have to install perl.";

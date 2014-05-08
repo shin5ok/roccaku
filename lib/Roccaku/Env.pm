@@ -20,7 +20,7 @@ sub new {
 
 sub env_string {
   my ($self) = @_;
-  return _create_env_string( $hash_ref );
+  return _create_env_string( $self->{env} );
 }
 
 sub _create_env_string {
