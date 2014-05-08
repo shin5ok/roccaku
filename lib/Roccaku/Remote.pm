@@ -19,9 +19,10 @@ our $sudo = qq{};
 our $temporary_working_base = q{/var/tmp};
 
 sub run {
-  my ($host, $params, $env) = @_;
+  my ($host, $params, $option) = @_;
 
-  $env ||= qq{};
+  my $env          = $option->{env};
+  my $install_perl = $option->{install_perl};
 
   can_do_remote( $host );
 
@@ -65,11 +66,11 @@ sub run {
     do {
       # require a perl
       local $?;
-      my $version = qx{ssh $host $env perl -v};
+      my $version = qx{$env ssh $host perl -v};
       if ($? != 0) {
         $do_try = 0;
-        if (exists $params->{'install-perl'}) {
-          my $pre = sprintf "ssh %s %s %s", $host, $env, $params->{'install-perl'};
+        if (defined $install_perl) {
+          my $pre = sprintf "%s ssh %s %s", $env, $host, $install_perl;
           system $pre;
         }
         croak "perl is not found.\nRoccaku require a perl, You have to install perl.";

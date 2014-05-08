@@ -180,11 +180,18 @@ sub run {
     eval {
       my $remote_params;
         %$remote_params = %$params;
-        my $host = delete $remote_params->{'host'};
-                   delete $remote_params->{'install-perl'};
+        my $host         = delete $remote_params->{'host'};
+        my $install_perl = delete $remote_params->{'install-perl'};
         warn Dumper { remote_params => $remote_params } if $self->debug;
 
-      $r = Roccaku::Remote::run( $host, $remote_params, $self->{env}->env_string );
+      $r = Roccaku::Remote::run(
+                                 $host,
+                                 $remote_params,
+                                 {
+                                   env          => $self->{env}->env_string,
+                                   install_perl => $install_perl,
+                                 }
+                                );
     };
     warn $@ if $@;
 
