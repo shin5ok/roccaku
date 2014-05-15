@@ -21,6 +21,10 @@ our $temporary_working_base = q{/var/tmp};
 sub run {
   my ($host, $params, $option) = @_;
 
+  if (not defined $host) {
+    croak "host not defined";
+  }
+
   my $env          = $option->{env};
   my $install_perl = $option->{install_perl};
 
@@ -49,7 +53,7 @@ sub run {
   local $| = 1;
   my $scp1 = "scp -r -q $path/ $host:$temporary_working_dir/";
   my $scp2 = "scp -r -q $params->{'config-path'} ${host}:$config_path";
-  my $run  = sprintf "ssh %s %s %s/bin/roccaku %s",
+  my $run  = sprintf qq{ssh %s %s %s/bin/roccaku %s},
                      $host,
                      $env,
                      $temporary_working_dir,

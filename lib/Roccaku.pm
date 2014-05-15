@@ -192,7 +192,7 @@ sub run {
                                           env          => $self->{env}->env_string,
                                           install_perl => $install_perl,
                                         }
-                                       );
+                                      );
     };
     warn $@ if $@;
 
