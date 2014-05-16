@@ -7,7 +7,7 @@ use warnings FATAL => 'all';
 use FindBin;
 use lib  qq($FindBin::Bin/../lib);
 use Roccaku::Run::Must;
-use base qw( Roccaku::Run::Must );
+use base qw( Roccaku::Run::Must_not );
 
 our $__GEN_SORT = 52;
 
