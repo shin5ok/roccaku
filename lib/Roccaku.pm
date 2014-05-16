@@ -205,6 +205,8 @@ sub run {
 
   my $test_only = $self->test_only;
 
+  $Roccaku::Run::Base::COMMAND_ENV = $self->{env}->env_string;
+
   for my $ref ( @{$run_objects->{$flag}} ) {
     my $result = +{ comment => q{}, fail => { must => [], do => [] } };
     my $comment;

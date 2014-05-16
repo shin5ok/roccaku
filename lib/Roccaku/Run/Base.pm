@@ -25,6 +25,8 @@ our $__RESULT = +{
 our $__NOT_LOG;
 our $__NOT_MODE;
 
+our $COMMAND_ENV;
+
 sub __result {
   my ($self, $name, $num) = @_;
   $num ||= 1;
@@ -109,7 +111,12 @@ sub command {
     local $| = 1;
 
     alarm $timeout if defined $timeout;
-    my $pid = open3 $w, $r, $e, $command; # It might have a deadlock problem
+
+    my $exec_command = $command;
+    if (defined $COMMAND_ENV) {
+      $exec_command = "$COMMAND_ENV $command";
+    }
+    my $pid = open3 $w, $r, $e, $exec_command; # It might have a deadlock problem
 
     if ($pid != 0) {
       waitpid $pid, 0;
