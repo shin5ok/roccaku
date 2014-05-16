@@ -1,4 +1,4 @@
-package Roccaku::Run::Skip;
+package Roccaku::Run::Skip_if;
 
 use 5.006;
 use strict;
@@ -13,4 +13,4 @@ our $__GEN_SORT = 52;
 
 local $Roccaku::Run::Base::__NOT_LOG = 1;
 
-1; # End of Roccaku::Run::Skip;
+1; # End of Roccaku::Run::Skip_if;

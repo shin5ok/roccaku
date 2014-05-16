@@ -220,8 +220,17 @@ sub run {
     $result->{comment} = $comment;
 
     my $is_skip;
-    if (exists $ref->{skip}) {
-      my $skip = $ref->{skip};
+    if (exists $ref->{skip_if}) {
+      my $skip = $ref->{skip_if};
+      $skip->run;
+
+      if ($skip->fail > 0) {
+        $is_skip = 1;
+      }
+    }
+
+    if (exists $ref->{skip_if_not}) {
+      my $skip = $ref->{skip_if_not};
       $skip->run;
 
       if ($skip->fail > 0) {
