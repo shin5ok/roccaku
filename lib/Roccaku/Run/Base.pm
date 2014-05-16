@@ -97,32 +97,45 @@ sub favor {
 }
 
 sub command {
-  my ($self, $command) = @_;
+  my ($self, $command, $timeout) = @_;
   my ($w, $r, $e) = (gensym, gensym, gensym);
   $command ||= "/bin/false";
   logging("[try to exec]: $command");
-  my $pid = open3 $w, $r, $e, $command; # It might have a deadlock problem
 
-  if ($pid != 0) {
-    waitpid $pid, 0;
-    my $exit_code = $? >> 8;
+  my ($exit_code, $stderr, $stdout) = (1, qq{none}, qq{none});
+  local $@;
+  eval {
+    local $SIG{ALRM} = sub { croak "##### command timeout" };
+    local $| = 1;
 
-    my $stderr = do { local $/; defined $e and <$e> };
-    my $stdout = do { local $/; defined $r and <$r> };
+    alarm $timeout if defined $timeout;
+    my $pid = open3 $w, $r, $e, $command; # It might have a deadlock problem
 
-    $self->logging( $stdout ) if $stdout and $self->debug;
-    $stdout ||= qq{none};
-    $stderr ||= qq{none};
+    if ($pid != 0) {
+      waitpid $pid, 0;
+      $exit_code = $? >> 8;
 
-    if (($exit_code != 0 and not $__NOT_MODE)
-         or ($exit_code == 0 and $__NOT_MODE)) {
-        $self->fail( "command: $command (stderr: $stderr)" );
-        return undef;
+      $stderr = do { local $/; defined $e and <$e> };
+      $stdout = do { local $/; defined $r and <$r> };
+
+      $self->logging( $stdout ) if $stdout and $self->debug;
+      $stdout ||= qq{none};
+      $stderr ||= qq{none};
     }
+    alarm 0;
 
-    return 1;
+  };
 
+  if ((defined $exit_code and $exit_code != 0 and not $__NOT_MODE)
+       or (defined $exit_code and $exit_code == 0 and $__NOT_MODE)
+       or $@) {
+      chomp $stderr if defined $stderr;
+      $self->fail( "command: $command" );
+      $self->fail( "  (stderr: $stderr)" );
+      $self->fail( "  (exception: $@)" ) if $@;
+      return undef;
   }
+  return 1;
 }
 
 sub file_backup {
