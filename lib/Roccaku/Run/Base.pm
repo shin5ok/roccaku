@@ -100,6 +100,11 @@ sub favor {
 
 sub command {
   my ($self, $command, $timeout) = @_;
+
+  if ($command =~ /%%/) {
+    croak "config yaml has some macro string";
+  }
+
   my ($w, $r, $e) = (gensym, gensym, gensym);
   $command ||= "/bin/false";
   logging("[try to exec]: $command");
