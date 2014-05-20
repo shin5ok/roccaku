@@ -42,7 +42,8 @@ sub file {
   local $@;
   eval {
     for my $pattern ( @patterns ) {
-      if (! grep m{$pattern}, @contents) {
+      my $pattern_compiled = qr/$pattern/;
+      if (! grep { /$pattern_compiled/ } @contents) {
         $self->fail("$argv->{path} don't have line $pattern");
         $failure++;
       }
