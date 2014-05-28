@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use FindBin;
 use Data::Dumper;
-
+use Carp;
 use Getopt::Long;
 use lib qq($FindBin::Bin/../lib);
 use Roccaku;
@@ -24,6 +24,8 @@ GetOptions(
   "is-remote"     , # use internal only
   "store-path=s"  , # use internal only
 );
+
+$SIG{TERM} = $SIG{INT} = sub { croak "!!! aborted... !!!" };
 
 my $r6 = Roccaku->new(
                        $params{"config-path"},

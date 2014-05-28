@@ -18,6 +18,8 @@ our $sudo = qq{};
 
 our $temporary_working_base = q{/var/tmp};
 
+local $SIG{INT} = $SIG{TERM} = sub { kill 15, $$ };
+
 sub run {
   my ($host, $params, $option) = @_;
 

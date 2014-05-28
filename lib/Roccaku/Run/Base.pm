@@ -26,6 +26,9 @@ our $__NOT_LOG;
 our $__NOT_MODE;
 
 our $COMMAND_ENV;
+my @child_pids;
+
+local $SIG{INT} = $SIG{TERM} = \&_abort_command_all;
 
 sub __result {
   my ($self, $name, $num) = @_;
@@ -98,6 +101,10 @@ sub favor {
   croak "Do nothing";
 }
 
+sub _abort_command_all {
+  kill 15, @child_pids if @child_pids > 0;
+}
+
 sub command {
   my ($self, $command, $timeout) = @_;
 
@@ -124,6 +131,7 @@ sub command {
     my $pid = open3 $w, $r, $e, $exec_command; # It might have a deadlock problem
 
     if ($pid != 0) {
+      push @child_pids, $pid;
       waitpid $pid, 0;
       $exit_code = $? >> 8;
 
