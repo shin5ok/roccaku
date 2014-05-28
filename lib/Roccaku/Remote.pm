@@ -18,8 +18,6 @@ our $sudo = qq{};
 
 our $temporary_working_base = q{/var/tmp};
 
-local $SIG{INT} = $SIG{TERM} = sub { kill 15, $$ };
-
 sub run {
   my ($host, $params, $option) = @_;
 
@@ -55,7 +53,7 @@ sub run {
   local $| = 1;
   my $scp1 = "scp -r -q $path/ $host:$temporary_working_dir/";
   my $scp2 = "scp -r -q $params->{'config-path'} ${host}:$config_path";
-  my $run  = sprintf qq{ssh %s %s %s/bin/roccaku %s},
+  my $run  = sprintf qq{ssh -t %s %s %s/bin/roccaku %s},
                      $host,
                      $env,
                      $temporary_working_dir,

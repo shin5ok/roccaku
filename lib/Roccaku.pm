@@ -46,6 +46,8 @@ use JSON::PP;
 
 our $__GEN_SORT = 10;
 
+local $SIG{INT} = sub { kill 15, 0 };
+
 sub new {
   my ($class, $config_path, $option) = @_;
 
