@@ -53,15 +53,19 @@ sub run {
   local $| = 1;
   my $scp1 = "scp -r -q $path/ $host:$temporary_working_dir/";
   my $scp2 = "scp -r -q $params->{'config-path'} ${host}:$config_path";
-  my $run  = sprintf qq{ssh -t %s %s %s/bin/roccaku %s},
+  my $run  = sprintf qq{ssh -t -q %s %s %s/bin/roccaku %s},
                      $host,
                      $env,
                      $temporary_working_dir,
                      $command_args;
-  my $json = sprintf "ssh %s $sudo cat %s/%s",
-                     $host,
-                     $temporary_working_dir,
-                     config->{result_name};
+  my $check_json = sprintf "ssh %s $sudo test -f %s/%s",
+                           $host,
+                           $temporary_working_dir,
+                           config->{result_name};
+  my $cat_json = sprintf "ssh %s $sudo cat %s/%s",
+                         $host,
+                         $temporary_working_dir,
+                         config->{result_name};
   my $rmd  = "ssh $host rm -Rf $temporary_working_dir";
 
   # 近いうちに、can_do_remote() に入れる
@@ -87,9 +91,17 @@ sub run {
   system $scp1;
   system $scp2;
   system $run;
-  my $output = qx{$json};
+  my $checked = system $check_json;
+  my $output;
+  if ($checked == 0) {
+    $output = qx{$cat_json};
+  }
   system $rmd;
   # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  if (not defined $output) {
+    croak "!!!!! get output failure !!!!!";
+  }
 
   return decode_json $output;
 

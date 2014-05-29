@@ -196,7 +196,11 @@ sub run {
                                         }
                                       );
     };
-    warn $@ if $@;
+
+    if ($@) {
+      warn $@;
+      croak "Remote exec aborted...";
+    }
 
     $flag = q{local};
     {
