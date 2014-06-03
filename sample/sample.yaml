@@ -4,6 +4,9 @@ env:
   PATH: /sbin:/usr/sbin:/bin:/usr/bin
   http_proxy: http://192.168.232.11:3128
 
+value:
+  sda4_uuid: blkid /dev/sda4 | cut -d ' ' -f 2
+
 run:
   main:
     - must:
@@ -176,6 +179,15 @@ run:
             rewrite:
               - add: "nameserver 192.168.232.12\n"
               - add: "nameserver 192.168.232.13\n"
+    - say: /var/vps in fstab
+      must:
+        file:
+          path: /etc/fstab
+          pattern: "\s/var/vps\s"
+      do:
+        file: /etc/fstab
+        rewrite:
+          add: "%%sda4_uuid /var/vps ext4 defaults 0 0\n"
 
   local:
     - say: local check dummy
