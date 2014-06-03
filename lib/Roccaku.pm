@@ -134,6 +134,12 @@ sub parse {
     $self->{env} = Roccaku::Env->new( $config->{env} );
   }
 
+  {
+    require Roccaku::Value;
+    no strict 'refs';
+    $self->{value} = Roccaku::Value->new( $config->{value} );
+  }
+
   my %object_hash;
   while (my ($key, $x) = each %{$config->{run}}) {
     my @objects;
@@ -211,7 +217,8 @@ sub run {
 
   my $test_only = $self->test_only;
 
-  $Roccaku::Run::Base::COMMAND_ENV = $self->{env}->env_string;
+  $Roccaku::Run::Base::COMMAND_ENV   = $self->{env}->env_string;
+  $Roccaku::Run::Base::COMMAND_VALUE = $self->{value}->value;
 
   for my $ref ( @{$run_objects->{$flag}} ) {
     my $result = +{ comment => q{}, fail => { must => [], do => [] } };

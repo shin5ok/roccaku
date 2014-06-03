@@ -68,6 +68,11 @@ sub file {
   eval {
     no strict 'refs';
     for my $r ( @rewrites ) {
+
+      for my $key (keys %$r) {
+        $r->{$key} = $self->value_rewriting( $r->{$key} );
+      }
+
       my %cond;
       exists $r->{after}  and $cond{after}  = 0;
       exists $r->{before} and $cond{before} = 0;

@@ -26,6 +26,7 @@ our $__NOT_LOG;
 our $__NOT_MODE;
 
 our $COMMAND_ENV;
+our $COMMAND_VALUE;
 my @child_pids;
 
 local $SIG{INT} = $SIG{TERM} = \&_abort_command_all;
@@ -109,7 +110,7 @@ sub command {
   my ($self, $command, $timeout) = @_;
 
   if ($command =~ /%%/) {
-    croak "config yaml has some macro string";
+    $command = $self->value_rewriting( $command );
   }
 
   my ($w, $r, $e) = (gensym, gensym, gensym);
@@ -156,6 +157,21 @@ sub command {
       return undef;
   }
   return 1;
+}
+
+sub value_rewriting {
+  my ($self, $string) = @_;
+
+  my $rewrited;
+  my $map = $COMMAND_VALUE;
+  while ( my ($key, $value) = each %$map ) {
+    if ($string =~ s/%%$key%%/$value/g) {
+      $rewrited = 1;
+    }
+  }
+  $rewrited or warn "not rewrite $string";
+  return $string;
+
 }
 
 sub file_backup {

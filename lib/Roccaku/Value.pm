@@ -20,10 +20,14 @@ sub new {
 
 sub _create_value_hash {
   my ($hash_ref) = @_;
-  my $ref = qq{};
+  my $ref = {};
+
+  no strict 'refs';
   while (my ($key, $value) = each %$hash_ref) {
-    if ($value =~ m{\`(.+)\`}) {
-      chomp ( $value = qx{$1} );
+
+    if ($value =~ m{(.+)}) {
+      $value = qx{$1};
+      chomp ( $value );
       $ref->{$key} = $value;
     }
   }
