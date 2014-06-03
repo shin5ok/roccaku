@@ -30,4 +30,8 @@ sub _create_value_hash {
   return $ref;
 }
 
+sub value {
+  return shift->{value};
+}
+
 1; # End of Roccaku::Value;
