@@ -134,7 +134,6 @@ run:
             replace:
               pre_pattern: "^GATEWAY\=.*"
               post_string: "GATEWAY=192.168.232.1\n"
-            add: "GATEWAY=192.168.232.1"
 
     - say: iptables check
       must_not:

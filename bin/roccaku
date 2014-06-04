@@ -20,10 +20,16 @@ GetOptions(
   "test-only"     ,
   "argv=s"        ,
   "host=s"        ,
+  "version"       ,
   "install-perl=s", # for remote
   "is-remote"     , # use internal only
   "store-path=s"  , # use internal only
 );
+
+if (defined $params{version}) {
+  print "Version: $Roccaku::VERSION\n";
+  exit 0;
+}
 
 my $r6 = Roccaku->new(
                        $params{"config-path"},
