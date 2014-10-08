@@ -34,9 +34,9 @@ sub file {
   }
 
   my @contents = <$fh>;
-  if (exists $argv->{is_same_file}) {
+  if (exists $argv->{same}) {
     my $data1 = _get_md5_hex( join "", @contents    );
-    my $data2 = _get_md5_hex( _get_data( $argv->{is_same_file} ) );
+    my $data2 = _get_md5_hex( _get_data( $argv->{is_same} ) );
     return $data1 eq $data2;
   }
 
