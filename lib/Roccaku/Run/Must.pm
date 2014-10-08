@@ -34,29 +34,36 @@ sub file {
   }
 
   my @contents = <$fh>;
-  if (exists $argv->{same}) {
-    my $data1 = _get_md5_hex( join "", @contents    );
-    my $data2 = _get_md5_hex( _get_data( $argv->{is_same} ) );
-    return $data1 eq $data2;
-  }
-
-  my @patterns = ref $argv->{pattern} eq q{ARRAY}
-               ? @{$argv->{pattern}}
-               : ( $argv->{pattern} );
 
   my $failure = 0;
-  local $@;
-  eval {
-    for my $pattern ( @patterns ) {
-      my $pattern_compiled = qr/$pattern/;
-      if (! grep { /$pattern_compiled/ } @contents) {
-        $self->fail("$argv->{path} don't have line $pattern");
-        $failure++;
-      }
-    }
-  };
-  warn $@ if $@;
+  if (exists $argv->{same}) {
+    my $data1 = _get_md5_hex( join "", @contents    );
+    my $data2 = _get_md5_hex( _get_data( $argv->{same} ) );
 
+    if ($data1 ne $data2) {
+      $self->fail("$argv->{path} and $argv->{same} are different file");
+      $failure++;
+    }
+
+  } else {
+
+    my @patterns = ref $argv->{pattern} eq q{ARRAY}
+                 ? @{$argv->{pattern}}
+                 : ( $argv->{pattern} );
+
+    local $@;
+    eval {
+      for my $pattern ( @patterns ) {
+        my $pattern_compiled = qr/$pattern/;
+        if (! grep { /$pattern_compiled/ } @contents) {
+          $self->fail("$argv->{path} don't have line $pattern");
+          $failure++;
+        }
+      }
+    };
+  }
+
+  warn $@ if $@;
   return $failure == 0;
 
 }
@@ -69,7 +76,9 @@ sub _get_md5_hex {
 sub _get_data {
   my $file = shift;
   if ($file =~ m{^([^:]+):(/.+)}) {
-    my @datas = qx{ssh $1 cat $2};
+    local $?;
+    my @datas = qx{ssh $1 cat $2 2>&1};
+    return qq{} if $? != 0;
     return join "", @datas;
   } else {
     open my $fh, "<", $file
