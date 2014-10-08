@@ -162,14 +162,17 @@ sub command {
 sub value_rewriting {
   my ($self, $string) = @_;
 
-  my $rewrited;
   my $map = $COMMAND_VALUE;
+  my $rewrited;
   while ( my ($key, $value) = each %$map ) {
     if ($string =~ s/%%$key%%/$value/g) {
       $rewrited = 1;
     }
   }
-  $rewrited or warn "not rewrite $string";
+  if ($self->debug and ! $rewrited) { 
+    local $Data::Dumper::Terse = 1;
+    warn "not rewrite ", Dumper $string;
+  }
   return $string;
 
 }
