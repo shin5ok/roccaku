@@ -16,11 +16,23 @@ Chef、ansible、serverspec が難しいひと向け
 
 ###利用例
 - テストモード  
+```
 $ sudo roccaku -c ./basic-server.yml --host webserver001 --test-only   
+```
 - テスト & 設定モード  
+```
 $ sudo roccaku -c ./basic-server.yml --host webserver001  
+```
 - テスト & 設定モード(ローカルのみで実行)  
+```
 $ sudo roccaku -c ./basic-server.yml  
+```
+- 引数渡して、テスト & 設定モード  
+```
+$ sudo roccaku -c ./basic-server.yml \
+  > --host webserver001
+  > --args "HOSTNAME=webserver001,IP=10.2.15.81,MASTER=master000"
+```
 
 ####basic-server.yml(設定例)
 
@@ -52,6 +64,15 @@ run:
       do:
         - yum -y install postfix
       say: postfix installed
+
+    # マスターのファイルと比較して同じ内容かどうか 
+    - must:
+        file:
+          path: /etc/ssh/sshd_confg
+          same: %%MASTER%%:/etc/ssh/sshd_config
+      do:
+        - scp -q %%MASTER%%:/etc/ssh/sshd_confg /etc/ssh/sshd_confg
+      say: sshd_config check
 
     - must:
         - ps ax | grep postfix/master | grep -v grep
@@ -249,10 +270,15 @@ run:
               - add: "nameserver 192.168.232.12\n"
               - add: "nameserver 192.168.232.13\n"
 
+  # このroccakuを実行しているサーバを起点にチェックしたいもの  
+  # roccakuのターゲットとなるサーバを起点にしたら、  
+  # ファイアウォールなどの通信制限があって実行できないチェックを実施
   local:
-    - say: local check dummy
+    - say: server monitor check
       must:
-        - command: true
+        # 監視サーバに登録されているかapiでチェック
+        - curl -k https://monitor-server:10065/server/%%HOSTNAME%%
       do:
-        - command: true
+        # 監視サーバにapiで登録
+        - curl -k -X POST -d "server=%%HOSTNAME%%" -d "ip=%%IP%%" https://monitor-server:10065/server/
 ```
