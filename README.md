@@ -30,7 +30,7 @@ $ sudo roccaku -c ./basic-server.yml
 - 引数渡して、テスト & 設定モード  
 ```
 $ sudo roccaku -c ./basic-server.yml \
-  > --host webserver001
+  > --host webserver001 \
   > --args "HOSTNAME=webserver001,IP=10.2.15.81,MASTER=master000"
 ```
 
