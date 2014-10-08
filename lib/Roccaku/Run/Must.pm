@@ -3,7 +3,7 @@ package Roccaku::Run::Must;
 use 5.006;
 use strict;
 use warnings FATAL => 'all';
-
+use Digest::MD5 qw(md5_hex);
 use FindBin;
 use lib  qq($FindBin::Bin/../lib);
 use Roccaku::Run::Base;
@@ -34,6 +34,12 @@ sub file {
   }
 
   my @contents = <$fh>;
+  if (exists $argv->{is_same_file}) {
+    my $data1 = _get_md5_hex( join "", @contents    );
+    my $data2 = _get_md5_hex( $argv->{is_same_file} );
+    return _compare( $data1, $data2 );
+  }
+
   my @patterns = ref $argv->{pattern} eq q{ARRAY}
                ? @{$argv->{pattern}}
                : ( $argv->{pattern} );
@@ -53,6 +59,11 @@ sub file {
 
   return $failure == 0;
 
+}
+
+sub _get_md5_hex {
+  my $data = shift;
+  return md5_hex $data;
 }
 
 1; # End of Roccaku::Run::Must;
