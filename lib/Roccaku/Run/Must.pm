@@ -36,8 +36,8 @@ sub file {
   my @contents = <$fh>;
   if (exists $argv->{is_same_file}) {
     my $data1 = _get_md5_hex( join "", @contents    );
-    my $data2 = _get_md5_hex( $argv->{is_same_file} );
-    return _compare( $data1, $data2 );
+    my $data2 = _get_md5_hex( _get_data( $argv->{is_same_file} ) );
+    return $data1 eq $data2;
   }
 
   my @patterns = ref $argv->{pattern} eq q{ARRAY}
@@ -64,6 +64,19 @@ sub file {
 sub _get_md5_hex {
   my $data = shift;
   return md5_hex $data;
+}
+
+sub _get_data {
+  my $file = shift;
+  if ($file =~ m{^([^:]+):(/.+)}) {
+    my @datas = qx{ssh $1 cat $2};
+    return join "", @datas;
+  } else {
+    open my $fh, "<", $file
+      or return qq{};
+    my @datas = <$fh>;
+    return join "", @datas;
+  }
 }
 
 1; # End of Roccaku::Run::Must;
