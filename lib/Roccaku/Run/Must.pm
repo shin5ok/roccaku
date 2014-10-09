@@ -41,7 +41,7 @@ sub file {
     my $data2 = _get_md5_hex( _get_data( $argv->{same} ) );
 
     if ($data1 ne $data2) {
-      $self->fail("$argv->{path} and $argv->{same} are different file");
+      $self->fail("$argv->{path}($data1) and $argv->{same}($data2) are different file");
       $failure++;
     }
 
@@ -79,7 +79,7 @@ sub _get_data {
     require Roccaku::Env;
     my $env_path = Roccaku::Env::_get_wrapper_path();
     local $?;
-    my @datas = qx{PATH=$env_path ssh $1 cat $2 2>&1};
+    my @datas = qx{PATH=$env_path:$ENV{PATH} ssh $1 cat $2 2>&1};
     return qq{} if $? != 0;
     return join "", @datas;
   } else {
