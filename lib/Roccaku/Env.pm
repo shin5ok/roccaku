@@ -26,11 +26,20 @@ sub env_string {
 sub _create_env_string {
   my ($hash_ref) = @_;
   my $env = qq{};
+  if (exists $hash_ref->{PATH}) {
+    $hash_ref->{PATH} = _get_wrapper_path() . ":$hash_ref->{PATH}";
+  } else {
+    $hash_ref->{PATH} = _get_wrapper_path() . ":$ENV{PATH}";
+  }
   while (my ($key, $value) = each %$hash_ref) {
     $env and $env .= qq{ };
     $env .= qq{${key}=$value};
   }
   return $env;
+}
+
+sub _get_wrapper_path {
+  return qq{$FindBin::Bin/../wrapper};
 }
 
 1; # End of Roccaku::Env;
