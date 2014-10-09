@@ -130,7 +130,7 @@ sub command {
       $exec_command = "$COMMAND_ENV $command";
     }
 
-    $self->logging( $exec_command );
+    $self->logging( $exec_command ) if $self->debug;
     my $pid = open3 $w, $r, $e, $exec_command; # It might have a deadlock problem
 
     if ($pid != 0) {

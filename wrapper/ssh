@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use File::Basename;
+use File::Spec;
+use Carp;
+
+our $keyname = ".tmp-key";
+my $mypath   = dirname ( File::Spec->rel2abs( $0 ) );
+my @paths    = split /:/, $ENV{PATH};
+
+warn $0;
+
+my $ssh_full_path;
+for my $path ( @paths ) {
+  $path =~ /^$mypath/ and next;
+  if (-x "$path/ssh") {
+    $ssh_full_path = "$path/ssh";
+  }
+}
+
+if (! $ssh_full_path) {
+  croak "ssh command not found";
+}
+
+my $command  = $ssh_full_path;
+   $command .= " -i $mypath/$keyname" if -f "$mypath/$keyname";
+   $command .= " " . ( join " ", @ARGV );
+
+exec $command;
