@@ -13,8 +13,8 @@ my @paths    = split /:/, $ENV{PATH};
 my $command_full_path;
 for my $path ( @paths ) {
   $path =~ /^$mypath/ and next;
-  if (-x "$path/ssh") {
-    $command_full_path = "$path/ssh";
+  if (-x "$path/$name") {
+    $command_full_path = "$path/$name";
   }
 }
 
@@ -22,8 +22,16 @@ if (! $command_full_path) {
   croak "$name command not found";
 }
 
+my $key_path = "$mypath/../$keyname";
 my $command  = $command_full_path;
-   $command .= " -i $mypath/$keyname" if -f "$mypath/$keyname";
+   $command .= " -i $key_path" if -f $key_path;
    $command .= " " . ( join " ", @ARGV );
-warn "||||||||||||| $command";
-exec $command;
+
+{ 
+  use FindBin;
+  use lib qq{$FindBin::Bin/../lib};
+  use Roccaku::Utils;
+  logging "$mypath/$keyname";
+  logging "| $name ||||||||||||| $command";
+  exec $command;
+}

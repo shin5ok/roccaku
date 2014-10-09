@@ -129,7 +129,7 @@ sub command {
     if (defined $COMMAND_ENV) {
       $exec_command = "$COMMAND_ENV $command";
     }
-    $self->logging( $exec_command );
+    logging $exec_command, undef;
 
     $self->logging( $exec_command ) if $self->debug;
     my $pid = open3 $w, $r, $e, $exec_command; # It might have a deadlock problem
@@ -210,8 +210,9 @@ sub fail {
 sub logging {
   my $self     = shift;
   my $string   = shift;
+  my $stderr   = shift || 1;
   no strict 'refs';
-  Roccaku::Utils::logging( $string, 1 ) if not $__NOT_LOG;
+  Roccaku::Utils::logging( $string, $stderr ) if not $__NOT_LOG;
 }
 
 our $AUTOLOAD;
