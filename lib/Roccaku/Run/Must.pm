@@ -76,8 +76,11 @@ sub _get_md5_hex {
 sub _get_data {
   my $file = shift;
   if ($file =~ m{^([^:]+):(/.+)}) {
+    require Roccaku::Env;
+    my $env_path = Roccaku::Env::_get_wrapper_path();
     local $?;
-    my @datas = qx{ssh $1 cat $2 2>&1};
+    warn qq{PATH=$env_path ssh $1 cat $2 2>&1};
+    my @datas = qx{PATH=$env_path ssh $1 cat $2 2>&1};
     return qq{} if $? != 0;
     return join "", @datas;
   } else {

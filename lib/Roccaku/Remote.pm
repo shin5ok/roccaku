@@ -53,6 +53,10 @@ sub run {
   local $| = 1;
   my $scp1 = "scp -r -q $path/ $host:$temporary_working_dir/";
   my $scp2 = "scp -r -q $params->{'config-path'} ${host}:$config_path";
+  my $scp3 = exists $params->{'ssh-key'}
+           ? "scp -q $params->{'ssh-key'} $host:$temporary_working_dir/.tmp-key"
+           : undef;
+
   my $run  = sprintf qq{ssh -t -q %s %s %s/bin/roccaku %s},
                      $host,
                      $env,
@@ -90,6 +94,7 @@ sub run {
 
   system $scp1;
   system $scp2;
+  system $scp3 if $scp3;
   system $run;
   my $checked = system $check_json;
   my $output;

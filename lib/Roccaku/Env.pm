@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use FindBin;
-use lib  qq($FindBin::Bin/../lib);
+use lib qq($FindBin::Bin/../lib);
 use Roccaku::Run::Base;
 
 our $env = qq{};

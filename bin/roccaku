@@ -24,6 +24,7 @@ GetOptions(
   "install-perl=s", # for remote
   "is-remote"     , # use internal only
   "store-path=s"  , # use internal only
+  "ssh-key=s"     ,
 );
 
 if (defined $params{version}) {
@@ -34,8 +35,8 @@ if (defined $params{version}) {
 my $r6 = Roccaku->new(
                        $params{"config-path"},
                        +{
-                          debug    => $params{debug},
-                          argv     => $params{argv},
+                          debug => $params{debug},
+                          argv  => $params{argv},
                         },
                      );
 

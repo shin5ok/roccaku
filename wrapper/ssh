@@ -6,25 +6,24 @@ use File::Spec;
 use Carp;
 
 our $keyname = ".tmp-key";
+my $name     = basename $0;
 my $mypath   = dirname ( File::Spec->rel2abs( $0 ) );
 my @paths    = split /:/, $ENV{PATH};
 
-warn $0;
-
-my $ssh_full_path;
+my $command_full_path;
 for my $path ( @paths ) {
   $path =~ /^$mypath/ and next;
   if (-x "$path/ssh") {
-    $ssh_full_path = "$path/ssh";
+    $command_full_path = "$path/ssh";
   }
 }
 
-if (! $ssh_full_path) {
-  croak "ssh command not found";
+if (! $command_full_path) {
+  croak "$name command not found";
 }
 
-my $command  = $ssh_full_path;
+my $command  = $command_full_path;
    $command .= " -i $mypath/$keyname" if -f "$mypath/$keyname";
    $command .= " " . ( join " ", @ARGV );
-
+warn "||||||||||||| $command";
 exec $command;
