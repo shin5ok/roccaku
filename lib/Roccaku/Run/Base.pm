@@ -129,6 +129,8 @@ sub command {
     if (defined $COMMAND_ENV) {
       $exec_command = "$COMMAND_ENV $command";
     }
+
+    $self->logging( $exec_command );
     my $pid = open3 $w, $r, $e, $exec_command; # It might have a deadlock problem
 
     if ($pid != 0) {
