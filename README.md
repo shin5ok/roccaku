@@ -27,11 +27,18 @@ $ sudo roccaku -c ./basic-server.yml --host webserver001
 ```
 $ sudo roccaku -c ./basic-server.yml  
 ```
-- 引数渡して、テスト & 設定モード  
+- 設定ファイルに置き換え引数を指定して、テスト & 設定モード  
 ```
 $ sudo roccaku -c ./basic-server.yml \
   > --host webserver001 \
   > --args "HOSTNAME=webserver001,IP=10.2.15.81,MASTER=master000"
+```
+- マスターに対する秘密鍵を指定して、テスト & 設定モード  
+  # マスターサーバにはこの秘密鍵に対応する公開鍵を設定しておく
+```
+$ sudo roccaku -c ./basic-server.yml \
+  > --host webserver001 \
+  > --args "MASTER=master000"
 ```
 
 ####basic-server.yml(設定例)
