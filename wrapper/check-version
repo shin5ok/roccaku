@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+
+my ($stdin, $regexp, $upper, $lower);
+GetOptions(
+  "stdin"    => \$stdin,
+  "regexp=s" => \$regexp,
+  "upper=s"  => \$upper,
+  "lower=s"  => \$lower,
+);
+
+my $data = qq{};
+
+# とりあえずは標準入力モードのみ
+if ($stdin) {
+  $data = <STDIN>;
+}
+
+my $version;
+if (defined $regexp) {
+  my $regexp_compiled = qr/$regexp/;
+  if ($data =~ /$regexp_compiled/) {
+    $version = $1;
+  }
+} else {
+  chomp( $version = $data );
+}
+
+my $fail = 0;
+if (defined $upper) {
+  if (_trim( $upper ) < _trim( $version ) ) {
+    $fail = 1;
+  }
+}
+if (defined $lower) {
+  if (_trim( $lower ) > _trim( $version ) ) {
+    $fail = 1;
+  }
+}
+
+if (! $fail) {
+  print "version is valid( $version )\n";
+  exit 0;
+} else {
+  print "version is INVALID( $version )\n";
+  exit 1;
+}
+
+sub _trim {
+  my $version = shift;
+  $version =~ s{[_\-\.]}{}g;
+  $version;
+}
+
