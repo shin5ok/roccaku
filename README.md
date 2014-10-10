@@ -38,7 +38,8 @@ $ sudo roccaku -c ./basic-server.yml \
 ```
 $ sudo roccaku -c ./basic-server.yml \
   > --host webserver001 \
-  > --args "MASTER=master000"
+  > --args "MASTER=master000" \
+  > --ssh-key /root/.ssh/id_rsa_for_roccaku
 ```
 
 ####basic-server.yml(設定例)
