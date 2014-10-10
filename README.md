@@ -82,6 +82,17 @@ run:
         - scp -q %%MASTER%%:/etc/ssh/sshd_confg /etc/ssh/sshd_confg
       say: sshd_config check
 
+    # マスターのファイルと比較して同じ内容かどうか 2
+    - must:
+        file:
+          path: /usr/local/nrpe/etc/nrpe.cfg
+          # パスを省略
+          same: %%MASTER%%:
+      do:
+        - rsync -ax -H -e ssh %%MASTER%%:/usr/local/nrpe/ /usr/local/nrpe/
+        - service nrpe restart
+      say: nrpe config check
+
     - must:
         - ps ax | grep postfix/master | grep -v grep
       do:

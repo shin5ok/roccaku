@@ -37,6 +37,10 @@ sub file {
 
   my $failure = 0;
   if (exists $argv->{same}) {
+    if ($argv->{same} =~ /^[^:]+:$/) {
+      $argv->{same} .= $argv->{path};
+    }
+
     my $data1 = _get_md5_hex( join "", @contents    );
     my $data2 = _get_md5_hex( _get_data( $argv->{same} ) );
 
