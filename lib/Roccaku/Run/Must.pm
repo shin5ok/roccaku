@@ -37,15 +37,18 @@ sub file {
 
   my $failure = 0;
   if (exists $argv->{same}) {
-    if ($argv->{same} =~ /^[^:]+:$/) {
-      $argv->{same} .= $argv->{path};
+
+    my $same = $argv->{same};
+    if ($argv->{same} =~ m{^([^\:]+\:)\-$}) {
+      $same  = $1;
+      $same .= $argv->{path};
     }
 
-    my $data1 = _get_md5_hex( join "", @contents    );
-    my $data2 = _get_md5_hex( _get_data( $argv->{same} ) );
+    my $data1 = _get_md5_hex( join "", @contents );
+    my $data2 = _get_md5_hex( _get_data( $same ) );
 
     if ($data1 ne $data2) {
-      $self->fail("$argv->{path}($data1) and $argv->{same}($data2) are different file");
+      $self->fail("$argv->{path}($data1) and $same($data2) are different file");
       $failure++;
     }
 

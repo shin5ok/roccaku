@@ -86,8 +86,8 @@ run:
     - must:
         file:
           path: /usr/local/nrpe/etc/nrpe.cfg
-          # パスを省略
-          same: %%MASTER%%:
+          # :- で終わると path を補完する
+          same: %%MASTER%%:-
       do:
         - rsync -ax -H -e ssh %%MASTER%%:/usr/local/nrpe/ /usr/local/nrpe/
         - service nrpe restart
