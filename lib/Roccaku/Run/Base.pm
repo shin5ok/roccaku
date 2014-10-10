@@ -115,7 +115,6 @@ sub command {
 
   my ($w, $r, $e) = (gensym, gensym, gensym);
   $command ||= "/bin/false";
-  logging("[try to exec]: $command");
 
   my ($exit_code, $stderr, $stdout) = (1, qq{none}, qq{none});
   local $@;
@@ -125,13 +124,12 @@ sub command {
 
     alarm $timeout if defined $timeout;
 
-    my $exec_command = $command;
+    my $exec_command = "sh -c '$command'";
     if (defined $COMMAND_ENV) {
-      $exec_command = "$COMMAND_ENV $command";
+      $exec_command = "$COMMAND_ENV $exec_command";
     }
-    logging ( $exec_command, undef );
+    $self->logging( $exec_command, 0 );
 
-    $self->logging( $exec_command ) if $self->debug;
     my $pid = open3 $w, $r, $e, $exec_command; # It might have a deadlock problem
 
     if ($pid != 0) {
@@ -207,10 +205,20 @@ sub fail {
   return @{$self->{fail}} + 0;
 }
 
+sub debug {
+  my $self = shift;
+  no strict 'refs';
+  return $self->{option}->{debug};
+}
+
 sub logging {
   my $self     = shift;
   my $string   = shift;
-  my $stderr   = shift || 1;
+  my $stderr   = shift;
+
+  if (! defined $stderr ) {
+    $stderr = 1;
+  }
   no strict 'refs';
   Roccaku::Utils::logging( $string, $stderr ) if not $__NOT_LOG;
 }

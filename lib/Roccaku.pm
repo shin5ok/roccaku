@@ -122,6 +122,7 @@ sub parse {
       }
     }
     if ($self->debug) {
+      local $Data::Dumper::Terse = 1;
       warn "####### config from yaml ###################";
       warn Dumper $config                                ;
       warn "############################################";
@@ -156,7 +157,7 @@ sub parse {
           if ($@) {
             croak "$full_module_name was load failure($@)";
           }
-          $hash_ref->{$name} = $full_module_name->new( $value );
+          $hash_ref->{$name} = $full_module_name->new( $value, { debug => $self->debug } );
         }
       }
       push @objects, $hash_ref;
