@@ -97,6 +97,10 @@ sub _template_render {
     $data =~ s{%%$key%%}{$value}g;
   }
 
+  if (my @keys = $data =~ m{(%%[^\%]+%%)}g) {
+    croak "still not replace keyword " . join ",", @keys;
+  }
+
   return $data;
 }
 
