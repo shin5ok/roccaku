@@ -67,6 +67,13 @@ run:
               pre_pattern: "^HOSTNAME\=.*"
               post_string: "HOSTNAME=%%HOSTNAME%%\n"
 
+    # バージョンのチェック
+    - say: check nginx version
+      must:
+        # 正規表現にひっかかった文字列が、指定したバージョンよりupperかlowerか
+        # この場合、nginxが 1.6.2 以上か
+        - nginx -v | check-version --regexp "nginx\/(\S+)" --upper 1.6.2
+
     - must:
         - rpm -qa | grep postfix
       do:
