@@ -124,7 +124,7 @@ sub command {
 
     alarm $timeout if defined $timeout;
 
-    my $exec_command = "sh -c '$command'";
+    my $exec_command = qq{sh -c '$command'};
     if (defined $COMMAND_ENV) {
       $exec_command = "$COMMAND_ENV $exec_command";
     }

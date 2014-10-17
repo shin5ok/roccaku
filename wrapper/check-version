@@ -1,7 +1,9 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+
 use Getopt::Long;
+use Carp;
 
 my ($stdin, $regexp, $upper, $lower);
 GetOptions(
@@ -23,9 +25,19 @@ if (defined $regexp) {
   my $regexp_compiled = qr/$regexp/;
   if ($data =~ /$regexp_compiled/) {
     $version = $1;
+  } else {
+     croak qq{not match /$regexp_compiled/ in string "$data"};
   }
 } else {
-  chomp( $version = $data );
+  if ($data =~ /([\d\.]+)/) {
+    $version = $1;
+  } else {
+    chomp( $version = $data );
+  }
+}
+
+if (! $version) {
+  croak qq{version number can't be gotton};
 }
 
 my $fail = 0;
@@ -50,7 +62,9 @@ if (! $fail) {
 
 sub _trim {
   my $version = shift;
-  $version =~ s{[_\-\.]}{}g;
+  if (defined $version) {
+    $version =~ s{[_\-\.]}{}g;
+  }
   $version;
 }
 
