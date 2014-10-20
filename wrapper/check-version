@@ -5,12 +5,13 @@ use warnings;
 use Getopt::Long;
 use Carp;
 
-my ($stdin, $regexp, $upper, $lower);
+my ($stdin, $regexp, $upper, $lower, $equal);
 GetOptions(
   "stdin"    => \$stdin,
   "regexp=s" => \$regexp,
   "upper=s"  => \$upper,
   "lower=s"  => \$lower,
+  "equal=s"  => \$equal,
 );
 
 my $data = qq{};
@@ -40,19 +41,27 @@ if (! $version) {
   croak qq{version number can't be gotton};
 }
 
-my $fail = 0;
+my @fails;
 if (defined $upper) {
-  if (_trim( $upper ) < _trim( $version ) ) {
-    $fail = 1;
+  # upperより小さかったらダメ
+  if (_trim( $upper ) > _trim( $version ) ) {
+    push @fails, qq{current: $version < $upper};
   }
 }
 if (defined $lower) {
-  if (_trim( $lower ) > _trim( $version ) ) {
-    $fail = 1;
+  # lowerより大きかったらダメ
+  if (_trim( $lower ) < _trim( $version ) ) {
+    push @fails, qq{current: $version > $lower};
+  }
+}
+if (defined $equal) {
+  # equalと同じでなければダメ
+  if (_trim( $equal ) != _trim( $version ) ) {
+    push @fails, qq{current: $version != $equal};
   }
 }
 
-if (! $fail) {
+if (@fails == 0) {
   print "version is valid( $version )\n";
   exit 0;
 } else {
