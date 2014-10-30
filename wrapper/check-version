@@ -17,6 +17,7 @@ GetOptions(
 my $data = qq{};
 
 # とりあえずは標準入力モードのみ
+$stdin = 1;
 if ($stdin) {
   $data = <STDIN>;
 }
