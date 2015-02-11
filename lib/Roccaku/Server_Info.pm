@@ -9,24 +9,27 @@ use Carp;
 use Data::Dumper;
 use Sys::Hostname;
 
+our $cache;
 our $info = {};
 
 sub new {
   my ($class, $server) = @_;
   bless {
-    server => $server,
+    server => $server || hostname,
   }, $class;
 }
 
 sub gather {
   my ($self) = @_;
-  {
-    no strict 'refs';
-    my $ref = $info->{$self->{server}};
-    $ref = $self->_gather_info;
-    return $ref;
+  return $self->_gather_info;
+}
+
+sub info {
+  my $self = shift;
+  if (! exists $cache->{$self->{server}}) {
+    $cache->{$self->{server}} = $self->gather;
   }
-  return $info;
+  return $cache->{$self->{server}};
 }
 
 sub _gather_info {

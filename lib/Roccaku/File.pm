@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 package Roccaku::File;
-use Roccaku::Env;
 
 =pod
  Roccaku::File::get_data( file_path, { as => 0|1, map => \%map });
@@ -23,8 +22,7 @@ sub _get_data {
     {
       no strict 'refs';
       if ($option->{as}) {
-        # stub
-        1 
+        
       }
     }
     return qq{} if $? != 0;
