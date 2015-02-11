@@ -36,16 +36,16 @@ sub file {
   my @contents = <$fh>;
 
   my $failure = 0;
-  if (exists $argv->{same}) {
+  if (exists $argv->{same} or exists $argv->{same_as}) {
 
-    my $same = $argv->{same};
-    if ($argv->{same} =~ m{^([^\:]+\:)\-$}) {
+    my $same = $argv->{same} || $argv->{same_as};
+    if ($same =~ m{^([^\:]+\:)\-$}) {
       $same  = $1;
       $same .= $argv->{path};
     }
 
     my $data1 = _get_md5_hex( join "", @contents );
-    my $data2 = _get_md5_hex( _get_data( $same ) );
+    my $data2 = _get_md5_hex( _get_data( $same, { as => exists $argv->{same_as} } ) );
 
     if ($data1 ne $data2) {
       $self->fail("$argv->{path}($data1) and $same($data2) are different file");
@@ -81,12 +81,20 @@ sub _get_md5_hex {
 }
 
 sub _get_data {
-  my $file = shift;
+  my $file   = shift;
+  my $option = shift || {};
   if ($file =~ m{^([^:]+):(/.+)}) {
     require Roccaku::Env;
     my $env_path = Roccaku::Env::_get_wrapper_path();
     local $?;
     my @datas = qx{PATH=$env_path:$ENV{PATH} ssh $1 cat $2 2>&1};
+    {
+      no strict 'refs';
+      if ($option->{as}) {
+        # stub
+        1 
+      }
+    }
     return qq{} if $? != 0;
     return join "", @datas;
   } else {
