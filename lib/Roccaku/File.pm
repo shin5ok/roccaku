@@ -19,7 +19,7 @@ sub _get_data {
     require Roccaku::Env;
     my $env_path = Roccaku::Env::_get_wrapper_path();
     local $?;
-    my @datas = qx{PATH=$env_path:$ENV{PATH} ssh $1 cat $2 2>&1};
+    my @datas = qx{PATH=$env_path:$ENV{PATH} ssh $1 cat $2};
     {
       no strict 'refs';
       if ($option->{as}) {
