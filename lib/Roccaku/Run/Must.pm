@@ -7,6 +7,7 @@ use Digest::MD5 qw(md5_hex);
 use FindBin;
 use lib  qq($FindBin::Bin/../lib);
 use Roccaku::Run::Base;
+use Roccaku::File;
 use base qw( Roccaku::Run::Base );
 
 our $__GEN_SORT = 50;
@@ -44,8 +45,12 @@ sub file {
       $same .= $argv->{path};
     }
 
+    my $as = exists $argv->{same_as} ? $argv->{same_as} : 0;
+
     my $data1 = _get_md5_hex( join "", @contents );
-    my $data2 = _get_md5_hex( _get_data( $same, { as => exists $argv->{same_as} } ) );
+    my $data2 = _get_md5_hex( Roccaku::File::get_data( $same,
+                                                        { as => $as },
+                                                      ) );
 
     if ($data1 ne $data2) {
       $self->fail("$argv->{path}($data1) and $same($data2) are different file");
@@ -78,31 +83,6 @@ sub file {
 sub _get_md5_hex {
   my $data = shift;
   return md5_hex $data;
-}
-
-sub _get_data {
-  my $file   = shift;
-  my $option = shift || {};
-  if ($file =~ m{^([^:]+):(/.+)}) {
-    require Roccaku::Env;
-    my $env_path = Roccaku::Env::_get_wrapper_path();
-    local $?;
-    my @datas = qx{PATH=$env_path:$ENV{PATH} ssh $1 cat $2 2>&1};
-    {
-      no strict 'refs';
-      if ($option->{as}) {
-        # stub
-        1 
-      }
-    }
-    return qq{} if $? != 0;
-    return join "", @datas;
-  } else {
-    open my $fh, "<", $file
-      or return qq{};
-    my @datas = <$fh>;
-    return join "", @datas;
-  }
 }
 
 1; # End of Roccaku::Run::Must;
