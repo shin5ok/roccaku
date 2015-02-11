@@ -10,7 +10,6 @@ use Data::Dumper;
 use Sys::Hostname;
 
 our $cache;
-our $info = {};
 
 sub new {
   my ($class, $server) = @_;
