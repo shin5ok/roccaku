@@ -159,7 +159,7 @@ sub parse {
           local $@;
           eval qq{use $full_module_name};
           if ($@) {
-            croak "$full_module_name was load failure($@)";
+            croak "$full_module_name was load failure...maybe YAML has some syntax error($@)";
           }
           $hash_ref->{$name} = $full_module_name->new( $value, { debug => $self->debug } );
         }
