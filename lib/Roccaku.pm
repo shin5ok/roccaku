@@ -258,7 +258,7 @@ sub run {
 
     if (! $is_skip) {
 
-      if (exists $ref->{must} or $ref->{must_not}) {
+      if (exists $ref->{must} or exists $ref->{must_not}) {
         my $must = $ref->{must} || $ref->{must_not};
         $must->run;
         $must->add_number;

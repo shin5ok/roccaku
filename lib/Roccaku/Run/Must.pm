@@ -53,8 +53,10 @@ sub file {
                                                       ) );
 
     if ($data1 ne $data2) {
-      $self->fail("$argv->{path}($data1) and $same($data2) are different file");
-      $failure++;
+      if (! $Roccaku::Run::Base::__NOT_MODE) {
+        $self->fail("$argv->{path}($data1) and $same($data2) are different file");
+        $failure++;
+      }
     }
 
   } else {

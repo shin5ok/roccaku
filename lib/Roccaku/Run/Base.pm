@@ -66,6 +66,11 @@ sub run {
 
   my $params = $self->params;
 
+  if (not defined $params) {
+    $self->fail("always fail since params is empty");
+    return 0;
+  }
+
   my @args = ref $params eq q{ARRAY}
            ? @$params
            : $params;
